@@ -12,16 +12,20 @@ public class CharacterControl : MonoBehaviour
 	private float m_fShootRange = 20.0f;
 	[SerializeField]
 	private float m_fAttackSpeed = 1.0f;
+	[SerializeField]
+	private float m_fDefaultDamages = 5.0f;
 	
 	#endregion
 	
 	#region Variables (private)
 
 	private NavMeshAgent m_tNavMesh;
-	private int iGroundLayer = ~(1 << 8);
+	static private int s_iObstacleRaycastLayer = ~(1 << 8);
+	static private int s_iShootRaycastLayer = ~(1 << 9);
 
 	private GameObject m_pTarget = null;
 	private float m_fLastAttackTime = 0.0f;
+	private bool m_bTargetInSight = false;
 	
 	#endregion
 
@@ -42,14 +46,30 @@ public class CharacterControl : MonoBehaviour
 
 		if (m_pTarget)
 		{
-			if ((transform.position - m_pTarget.transform.position).sqrMagnitude <= (m_fShootRange * m_fShootRange))
+			if (!m_bTargetInSight)
 			{
-				m_tNavMesh.Stop();
+				m_bTargetInSight = IsTargetInSight();
+			}
+
+			if (TargetOnRange && m_bTargetInSight)
+			{
+				if (m_tNavMesh.hasPath)
+				{
+					m_tNavMesh.destination = transform.position;
+					transform.LookAt(m_pTarget.transform);
+				}
+
 				Attack();
 
 				if (m_pTarget.GetComponent<TargetScript>().IsDead)
+				{
 					m_pTarget = null;
+					m_bTargetInSight = false;
+				}
 			}
+
+			else
+				m_tNavMesh.destination = m_pTarget.transform.position;
 		}
 
 
@@ -59,19 +79,23 @@ public class CharacterControl : MonoBehaviour
 
 			RaycastHit Hit;
 
-			if (Physics.Raycast(tMousePos, Camera.main.transform.forward, out Hit, float.MaxValue, iGroundLayer, QueryTriggerInteraction.Ignore))
+			if (Physics.Raycast(tMousePos, Camera.main.transform.forward, out Hit, float.MaxValue, s_iObstacleRaycastLayer, QueryTriggerInteraction.Ignore))
 			{
 				tSphereTest.SetActive(true);
 				tSphereTest.transform.position = Hit.point;
-				m_tNavMesh.destination = Hit.point;
+
 
 				if (Hit.collider.tag != "Target")
+				{
 					m_pTarget = null;
+					m_tNavMesh.destination = Hit.point;
+				}
 
 				else
+				{
 					m_pTarget = Hit.collider.gameObject;
-
-				m_tNavMesh.Resume();
+					m_tNavMesh.destination = m_pTarget.transform.position;
+				}
 			}
 		}
 	}
@@ -81,8 +105,34 @@ public class CharacterControl : MonoBehaviour
 	{
 		if (Time.fixedTime - m_fLastAttackTime >= m_fAttackSpeed)
 		{
-			m_pTarget.GetComponent<TargetScript>().Damage(5.0f);
+			RaycastHit Hit;
+
+			if (Physics.Raycast(transform.position, transform.forward, out Hit, m_fShootRange, s_iShootRaycastLayer, QueryTriggerInteraction.Ignore))
+			{
+				Debug.DrawLine(transform.position, Hit.point, Color.red);
+
+				TargetScript tShotThing = Hit.collider.gameObject.GetComponent<TargetScript>();
+
+				if (tShotThing)
+					tShotThing.Damage(m_fDefaultDamages);
+			}
+			
 			m_fLastAttackTime = Time.fixedTime;
+		}
+	}
+
+
+	bool IsTargetInSight()
+	{
+		RaycastHit Hit;
+		return Physics.Raycast(transform.position, transform.forward, out Hit, m_fShootRange, s_iObstacleRaycastLayer, QueryTriggerInteraction.Ignore) && Hit.collider.gameObject == m_pTarget;
+	}
+
+	bool TargetOnRange
+	{
+		get
+		{
+			return (transform.position - m_pTarget.transform.position).sqrMagnitude <= (m_fShootRange * m_fShootRange);
 		}
 	}
 }
