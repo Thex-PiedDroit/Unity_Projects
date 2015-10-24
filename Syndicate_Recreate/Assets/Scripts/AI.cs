@@ -28,7 +28,7 @@ public class AI : LivingBeing
 	{
 		if (m_bAlive)
 		{
-			switch(m_eBehavior)
+			switch(m_eBehaviour)
 			{
 			case Behaviour.Agressive:
 

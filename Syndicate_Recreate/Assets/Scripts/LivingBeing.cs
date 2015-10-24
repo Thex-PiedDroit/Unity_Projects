@@ -10,7 +10,7 @@ public class LivingBeing : MonoBehaviour
 
 	[Header("Fight")]
 	[SerializeField]
-	protected Behaviour m_eBehavior = Behaviour.Coward;
+	protected Behaviour m_eBehaviour = Behaviour.Coward;
 	[SerializeField]
 	protected float m_fSightRange = 25.0f;
 	[SerializeField]
@@ -65,7 +65,7 @@ public class LivingBeing : MonoBehaviour
 	{
 		if (m_pTarget)
 		{
-			switch(m_eBehavior)
+			switch(m_eBehaviour)
 			{
 			case Behaviour.Agressive:
 			case Behaviour.Defensive:
@@ -84,7 +84,7 @@ public class LivingBeing : MonoBehaviour
 			}
 		}
 
-		else if (m_eBehavior != Behaviour.Player)
+		else if (m_eBehaviour != Behaviour.Player)
 			m_tNavMesh.destination = transform.position;
 	}
 
@@ -171,8 +171,8 @@ public class LivingBeing : MonoBehaviour
 		if (m_fHealth <= 0.0f)
 			m_bAlive = false;
 
-		else if (m_eBehavior == Behaviour.Coward ||
-				 m_eBehavior == Behaviour.Defensive)
+		else if (m_eBehaviour == Behaviour.Coward ||
+				 m_eBehaviour == Behaviour.Defensive)
 			m_pTarget = pAttacker;
 	}
 
