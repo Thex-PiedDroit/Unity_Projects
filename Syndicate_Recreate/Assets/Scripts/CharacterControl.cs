@@ -7,25 +7,15 @@ public class CharacterControl : MonoBehaviour
 
 	[SerializeField]
 	private GameObject tSphereTest;
-
-	[SerializeField]
-	private float m_fShootRange = 20.0f;
-	[SerializeField]
-	private float m_fAttackSpeed = 1.0f;
-	[SerializeField]
-	private float m_fDefaultDamages = 5.0f;
 	
 	#endregion
 	
 	#region Variables (private)
 
-	private NavMeshAgent m_tNavMesh;
-	static private int s_iObstacleRaycastLayer = ~(1 << 8);
-	static private int s_iShootRaycastLayer = ~(1 << 9);
+	private Fight m_tFightScript;
 
-	private GameObject m_pTarget = null;
-	private float m_fLastAttackTime = 0.0f;
-	private bool m_bTargetInSight = false;
+	private NavMeshAgent m_tNavMesh;
+	private TargetScript m_tTargetScript;
 	
 	#endregion
 
@@ -35,104 +25,52 @@ public class CharacterControl : MonoBehaviour
 	{
 		tSphereTest.SetActive(false);
 		m_tNavMesh = GetComponent<NavMeshAgent>();
+		m_tFightScript = GetComponent<Fight>();
+		m_tTargetScript = GetComponent<TargetScript>();
 	}
 	
 
 	void Update ()
 	{
-		if (tSphereTest.activeInHierarchy && !m_tNavMesh.hasPath)
+		if (m_tTargetScript.IsDead)
+		{
+			transform.forward = Vector3.down;
+			m_tNavMesh.destination = transform.position;
+			m_tNavMesh.Stop();
 			tSphereTest.SetActive(false);
-
-
-		if (m_pTarget)
-		{
-			if (!m_bTargetInSight)
-			{
-				m_bTargetInSight = IsTargetInSight();
-			}
-
-			if (TargetOnRange && m_bTargetInSight)
-			{
-				if (m_tNavMesh.hasPath)
-				{
-					m_tNavMesh.destination = transform.position;
-					transform.LookAt(m_pTarget.transform);
-				}
-
-				Attack();
-
-				if (m_pTarget.GetComponent<TargetScript>().IsDead)
-				{
-					m_pTarget = null;
-					m_bTargetInSight = false;
-				}
-			}
-
-			else
-				m_tNavMesh.destination = m_pTarget.transform.position;
 		}
 
-
-		if (Input.GetButtonDown("Click"))
+		else
 		{
-			Vector3 tMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+			if (tSphereTest.activeInHierarchy && !m_tNavMesh.hasPath)
+				tSphereTest.SetActive(false);
 
-			RaycastHit Hit;
 
-			if (Physics.Raycast(tMousePos, Camera.main.transform.forward, out Hit, float.MaxValue, s_iObstacleRaycastLayer, QueryTriggerInteraction.Ignore))
+			if (Input.GetButtonDown("Click"))
 			{
-				tSphereTest.SetActive(true);
-				tSphereTest.transform.position = Hit.point;
+				Vector3 tMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
+				RaycastHit Hit;
 
-				if (Hit.collider.tag != "Target")
+				if (Physics.Raycast(tMousePos, Camera.main.transform.forward, out Hit, float.MaxValue, ~Fight.ObstaclesRaycastLayer, QueryTriggerInteraction.Ignore))
 				{
-					m_pTarget = null;
-					m_tNavMesh.destination = Hit.point;
-				}
+					tSphereTest.SetActive(true);
+					tSphereTest.transform.position = Hit.point;
 
-				else
-				{
-					m_pTarget = Hit.collider.gameObject;
-					m_tNavMesh.destination = m_pTarget.transform.position;
+
+					if (Hit.collider.tag != "Target")
+					{
+						m_tFightScript.Target = null;
+						m_tNavMesh.destination = Hit.point;
+					}
+
+					else
+					{
+						m_tFightScript.Target = Hit.collider.gameObject;
+						m_tNavMesh.destination = m_tFightScript.Target.transform.position;
+					}
 				}
 			}
-		}
-	}
-
-
-	void Attack()
-	{
-		if (Time.fixedTime - m_fLastAttackTime >= m_fAttackSpeed)
-		{
-			RaycastHit Hit;
-
-			if (Physics.Raycast(transform.position, transform.forward, out Hit, m_fShootRange, s_iShootRaycastLayer, QueryTriggerInteraction.Ignore))
-			{
-				Debug.DrawLine(transform.position, Hit.point, Color.red);
-
-				TargetScript tShotThing = Hit.collider.gameObject.GetComponent<TargetScript>();
-
-				if (tShotThing)
-					tShotThing.Damage(m_fDefaultDamages);
-			}
-			
-			m_fLastAttackTime = Time.fixedTime;
-		}
-	}
-
-
-	bool IsTargetInSight()
-	{
-		RaycastHit Hit;
-		return Physics.Raycast(transform.position, transform.forward, out Hit, m_fShootRange, s_iObstacleRaycastLayer, QueryTriggerInteraction.Ignore) && Hit.collider.gameObject == m_pTarget;
-	}
-
-	bool TargetOnRange
-	{
-		get
-		{
-			return (transform.position - m_pTarget.transform.position).sqrMagnitude <= (m_fShootRange * m_fShootRange);
 		}
 	}
 }

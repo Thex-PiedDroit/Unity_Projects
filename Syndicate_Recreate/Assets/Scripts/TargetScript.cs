@@ -6,13 +6,13 @@ public class TargetScript : MonoBehaviour
 	#region Variables (public)
 
 	[SerializeField]
-	private float m_fHealth = 20.0f;
+	private float m_fHealth = 10.0f;
 	
 	#endregion
 	
 	#region Variables (private)
 
-	private bool m_bDead = false;
+	private bool m_bAlive = true;
 	
 	#endregion
 
@@ -22,15 +22,11 @@ public class TargetScript : MonoBehaviour
 		m_fHealth -= fDamages;
 
 		if (m_fHealth <= 0.0f)
-		{
-			m_bDead = true;
-			Destroy(gameObject);
-		}
-
+			m_bAlive = false;
 	}
 
 	public bool IsDead
 	{
-		get { return m_bDead; }
+		get { return !m_bAlive; }
 	}
 }
