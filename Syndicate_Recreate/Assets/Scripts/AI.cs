@@ -1,57 +1,68 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CommunistBehavior : MonoBehaviour
+public class AI : LivingBeing
 {
 	#region Variables (public)
-
-
+	
+	
 	
 	#endregion
 	
 	#region Variables (private)
 
 	static private GameObject[] s_pPlayerCharacters = null;
-
-	private Fight m_tFightScript;
-	private TargetScript m_tTargetScript;
 	
 	#endregion
 
 
-	void Start()
+	void Start ()
 	{
 		if (s_pPlayerCharacters == null)
 			s_pPlayerCharacters = GameObject.FindGameObjectsWithTag("PlayerCharacter");
 
-		m_tFightScript = GetComponent<Fight>();
-		m_tTargetScript = GetComponent<TargetScript>();
+		base.BehaviourStart();
 	}
 	
 	void Update ()
 	{
-		if (m_tTargetScript.IsDead)
-			Destroy(gameObject);
+		if (m_bAlive)
+		{
+			switch(m_eBehavior)
+			{
+			case Behaviour.Agressive:
+
+				m_pTarget = SearchTarget();
+
+				break;
+
+			case Behaviour.Ally:
+
+				m_pTarget = GetPlayerTarget();
+
+				break;
+			}
+
+			base.BehaviourUpdate();
+		}
 
 		else
-		{
-			m_tFightScript.Target = FindTarget();
-		}
+			Destroy(gameObject);
 	}
 
 
 	#region Methods
 
-	GameObject FindTarget()
+	GameObject SearchTarget()
 	{
 		GameObject pTarget = null;
 
-		float fNearestCharacterSqrdDist = m_tFightScript.SightRange;
+		float fNearestCharacterSqrdDist = m_fSightRange;
 		fNearestCharacterSqrdDist *= fNearestCharacterSqrdDist;
 
 		foreach (GameObject tCharacter in s_pPlayerCharacters)
 		{
-			if (!tCharacter.GetComponent<TargetScript>().IsDead)
+			if (!tCharacter.GetComponent<LivingBeing>().IsDead)
 			{
 				float fSqrdDist = (transform.position - tCharacter.transform.position).sqrMagnitude;
 
@@ -64,6 +75,13 @@ public class CommunistBehavior : MonoBehaviour
 		}
 
 		return pTarget;
+	}
+
+	GameObject GetPlayerTarget()
+	{
+		// Will do if needed
+
+		return null;
 	}
 
 	#endregion
