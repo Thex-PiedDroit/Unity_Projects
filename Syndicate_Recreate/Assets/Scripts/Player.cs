@@ -11,7 +11,7 @@ public class Player : LivingBeing
 	#endregion
 	
 	#region Variables (private)
-	
+
 	
 	
 	#endregion
@@ -69,6 +69,23 @@ public class Player : LivingBeing
 			m_tNavMesh.destination = transform.position;
 			m_tNavMesh.Stop();
 			tSphereTest.SetActive(false);
+		}
+	}
+
+
+	void OnTriggerEnter(Collider tTrigger)
+	{
+		if (tTrigger.gameObject.tag == "Building")
+		{
+			tTrigger.gameObject.GetComponent<BuildingBehaviour>().ToggleFloorsAboveRenderers();
+		}
+	}
+
+	void OnTriggerExit(Collider tTrigger)
+	{
+		if (tTrigger.gameObject.tag == "Building")
+		{
+			tTrigger.gameObject.GetComponent<BuildingBehaviour>().ToggleFloorsAboveRenderers();
 		}
 	}
 }
