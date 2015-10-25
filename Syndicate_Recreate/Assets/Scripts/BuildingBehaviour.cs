@@ -22,6 +22,7 @@ public class BuildingBehaviour : MonoBehaviour
 		foreach(MeshRenderer tFloorRenderer in m_pFloorsAbove)
 		{
 			tFloorRenderer.enabled = !tFloorRenderer.enabled;
+			tFloorRenderer.gameObject.GetComponent<BoxCollider>().enabled = tFloorRenderer.enabled;
 		}
 	}
 }

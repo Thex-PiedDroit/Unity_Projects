@@ -19,6 +19,16 @@ public class LivingBeing : MonoBehaviour
 	private float m_fAttackSpeed = 1.0f;
 	[SerializeField]
 	private float m_fDefaultDamages = 2.0f;
+
+	[Header("Display")]
+	[SerializeField]
+	private Material m_pMaterialReg;
+	[SerializeField]
+	private Material m_pMaterialTransp;
+	[SerializeField]
+	private Material m_pForwardCubeMaterialReg;
+	[SerializeField]
+	private Material m_pForwardCubeMaterialTransp;
 	
 	#endregion
 
@@ -35,6 +45,10 @@ public class LivingBeing : MonoBehaviour
 
 
 	protected bool m_bAlive = true;
+
+	private MeshRenderer m_tMeshRenderer;
+	private MeshRenderer m_tForwardCubeMeshRenderer;
+	private CapsuleCollider m_tCapsuleCollider;
 
 	protected NavMeshAgent m_tNavMesh;
 
@@ -57,6 +71,9 @@ public class LivingBeing : MonoBehaviour
 
 	protected void BehaviourStart()
 	{
+		m_tMeshRenderer = GetComponent<MeshRenderer>();
+		m_tForwardCubeMeshRenderer = transform.FindChild("Forward").gameObject.GetComponent<MeshRenderer>();
+		m_tCapsuleCollider = GetComponent<CapsuleCollider>();
 		m_tNavMesh = GetComponent<NavMeshAgent>();
 		m_fDefaultSpeed = m_tNavMesh.speed;
 	}
@@ -86,6 +103,8 @@ public class LivingBeing : MonoBehaviour
 
 		else if (m_eBehaviour != Behaviour.Player)
 			m_tNavMesh.destination = transform.position;
+
+		CheckCameraVisibility();
 	}
 
 
@@ -161,6 +180,25 @@ public class LivingBeing : MonoBehaviour
 		}
 	}
 
+	void CheckCameraVisibility()
+	{
+		Vector3 tCapsulePoint1 = transform.position - (transform.up * (m_tCapsuleCollider.height / 4.0f));
+		Vector3 tCapsulePoint2 = transform.position + (transform.up * (m_tCapsuleCollider.height / 4.0f));
+
+		bool bObstacleInSight = Physics.CapsuleCast(tCapsulePoint1, tCapsulePoint2, m_tCapsuleCollider.radius, -Camera.main.transform.forward, Camera.main.farClipPlane, s_iObstaclesRaycastLayer, QueryTriggerInteraction.Ignore);
+
+		if (bObstacleInSight && (m_tMeshRenderer.material != m_pMaterialTransp))
+		{
+			m_tMeshRenderer.material = m_pMaterialTransp;
+			m_tForwardCubeMeshRenderer.material = m_pForwardCubeMaterialTransp;
+		}
+
+		else if (m_tMeshRenderer.material != m_pMaterialReg)
+		{
+			m_tMeshRenderer.material = m_pMaterialReg;
+			m_tForwardCubeMeshRenderer.material = m_pForwardCubeMaterialReg;
+		}
+	}
 
 	#region Methods
 
