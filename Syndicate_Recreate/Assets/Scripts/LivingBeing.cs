@@ -6,7 +6,7 @@ public class LivingBeing : MonoBehaviour
 	#region Variables (public)
 
 	[SerializeField]
-	private float m_fHealth = 10.0f;
+	protected float m_fMaxHealth = 10.0f;
 
 	[Header("Fight")]
 	[SerializeField]
@@ -45,6 +45,8 @@ public class LivingBeing : MonoBehaviour
 
 
 	protected bool m_bAlive = true;
+	protected float m_fHealth = 10.0f;
+	protected bool m_bJustTookDamage = false;
 
 	private MeshRenderer m_tMeshRenderer;
 	private MeshRenderer m_tForwardCubeMeshRenderer;
@@ -71,6 +73,8 @@ public class LivingBeing : MonoBehaviour
 
 	protected void BehaviourStart()
 	{
+		m_fHealth = m_fMaxHealth;
+
 		m_tMeshRenderer = GetComponent<MeshRenderer>();
 		m_tForwardCubeMeshRenderer = transform.FindChild("Forward").gameObject.GetComponent<MeshRenderer>();
 		m_tCapsuleCollider = GetComponent<CapsuleCollider>();
@@ -212,6 +216,8 @@ public class LivingBeing : MonoBehaviour
 		else if (m_eBehaviour == Behaviour.Coward ||
 				 m_eBehaviour == Behaviour.Defensive)
 			m_pTarget = pAttacker;
+
+		m_bJustTookDamage = true;
 	}
 
 	public bool IsDead

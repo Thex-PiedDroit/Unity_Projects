@@ -5,14 +5,22 @@ public class Player : LivingBeing
 {
 	#region Variables (public)
 
+	[Header("HUD")]
 	[SerializeField]
 	private GameObject tSphereTest;
+
+	[SerializeField]
+	private GameObject tSelectedGizmo;
+	[SerializeField]
+	private RectTransform tHealthBarGizmo;
 	
 	#endregion
 	
 	#region Variables (private)
 
-	
+	private bool m_bSelected = false;
+
+	private float m_fDefaultHealthBarScaleY = 1.0f;
 	
 	#endregion
 
@@ -25,6 +33,8 @@ public class Player : LivingBeing
 	void Start()
 	{
 		base.BehaviourStart();
+
+		m_fDefaultHealthBarScaleY = tHealthBarGizmo.localScale.y;
 	}
 	
 	void Update ()
@@ -34,29 +44,42 @@ public class Player : LivingBeing
 			if (tSphereTest.activeInHierarchy && !m_tNavMesh.hasPath)
 				tSphereTest.SetActive(false);
 
-
-			if (Input.GetButtonDown("Click"))
+			if (m_bSelected)
 			{
-				Vector3 tMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-				RaycastHit Hit;
-
-				if (Physics.Raycast(tMousePos, Camera.main.transform.forward, out Hit, float.MaxValue, ~s_iObstaclesRaycastLayer, QueryTriggerInteraction.Ignore))
+				if (Input.GetButtonDown("Submit"))
 				{
-					tSphereTest.SetActive(true);
-					tSphereTest.transform.position = Hit.point;
-
-					if (Hit.collider.tag == "Target")
+					if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
 					{
-						m_pTarget = Hit.collider.gameObject;
-						m_tNavMesh.destination = m_pTarget.transform.position;
-					}
+						Vector3 tMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-					else
-					{
-						m_pTarget = null;
-						m_tNavMesh.destination = Hit.point;
+						RaycastHit Hit;
+
+						if (Physics.Raycast(tMousePos, Camera.main.transform.forward, out Hit, float.MaxValue, ~s_iObstaclesRaycastLayer, QueryTriggerInteraction.Ignore))
+						{
+							if (Hit.collider.tag != "UI")
+							{
+								tSphereTest.SetActive(true);
+								tSphereTest.transform.position = Hit.point;
+
+								if (Hit.collider.tag == "Target")
+								{
+									m_pTarget = Hit.collider.gameObject;
+									m_tNavMesh.destination = m_pTarget.transform.position;
+								}
+
+								else
+								{
+									m_pTarget = null;
+									m_tNavMesh.destination = Hit.point;
+								}
+							}
+						}
 					}
+				}
+
+				if (Input.GetButton("Cancel"))
+				{
+					SelectUnit(false);
 				}
 			}
 
@@ -70,6 +93,28 @@ public class Player : LivingBeing
 			m_tNavMesh.Stop();
 			tSphereTest.SetActive(false);
 		}
+
+		if (m_bJustTookDamage)
+			UpdateHealthBar();
+	}
+
+
+	public void SelectUnit(bool bSelected)
+	{
+		m_bSelected = bSelected;
+		tSelectedGizmo.SetActive(bSelected);
+	}
+
+	void UpdateHealthBar()
+	{
+		float fHealthPercentage = (m_fMaxHealth / 100.0f) * m_fHealth;
+		float fNewScale = m_fDefaultHealthBarScaleY * fHealthPercentage;
+
+		Vector3 tScale = tHealthBarGizmo.localScale;
+		tScale.y = fNewScale;
+		tHealthBarGizmo.localScale = tScale;
+
+		m_bJustTookDamage = false;
 	}
 
 
