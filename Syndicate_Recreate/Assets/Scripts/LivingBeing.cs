@@ -10,11 +10,11 @@ public class LivingBeing : MonoBehaviour
 
 	[Header("Fight")]
 	[SerializeField]
-	protected Behaviour m_eBehaviour = Behaviour.Coward;
+	protected Behaviour m_eBehaviour = Behaviour.Neutral;
 	[SerializeField]
 	protected float m_fSightRange = 25.0f;
 	[SerializeField]
-	private float m_fShootRange = 20.0f;
+	protected float m_fAttackRange = 20.0f;
 	[SerializeField]
 	private float m_fAttackSpeed = 1.0f;
 	[SerializeField]
@@ -36,6 +36,7 @@ public class LivingBeing : MonoBehaviour
 
 	protected enum Behaviour
 	{
+		Neutral,
 		Coward,
 		Agressive,
 		Defensive,
@@ -94,13 +95,12 @@ public class LivingBeing : MonoBehaviour
 			case Behaviour.Player:
 
 				FollowTarget();
-
 				break;
 
+			case Behaviour.Neutral:
 			case Behaviour.Coward:
 
 				Flee();
-
 				break;
 			}
 		}
@@ -111,6 +111,8 @@ public class LivingBeing : MonoBehaviour
 		CheckCameraVisibility();
 	}
 
+
+	#region Methods
 
 	void FollowTarget()
 	{
@@ -135,7 +137,7 @@ public class LivingBeing : MonoBehaviour
 		{
 			if (IsTargetInRange(m_fSightRange))
 				m_tNavMesh.destination = m_pTarget.transform.position;
-			else
+			else if (m_eBehaviour != Behaviour.Player)
 			{
 				m_tNavMesh.destination = transform.position;
 				m_pTarget = null;
@@ -148,10 +150,8 @@ public class LivingBeing : MonoBehaviour
 	void Flee()
 	{
 		m_tNavMesh.speed = m_fDefaultSpeed * 2.0f;
-		
-		Vector3 tFleeDirection = transform.position - m_pTarget.transform.position;
 
-		if (!IsTargetInRange(m_fSightRange))
+		if (tag != "Target" && !IsTargetInRange(m_fSightRange))
 		{
 			m_pTarget = null;
 			m_tNavMesh.destination = transform.position;
@@ -159,7 +159,20 @@ public class LivingBeing : MonoBehaviour
 		}
 
 		else if (!m_tNavMesh.hasPath)
-			m_tNavMesh.SetDestination(transform.position + tFleeDirection);
+		{
+			Vector3 tFleeDestination;
+
+			if (tag == "Target")
+				tFleeDestination = GameObject.Find("EscapePoint").transform.position;
+
+			else
+			{
+				Vector3 tFleeDirection = (transform.position - m_pTarget.transform.position);
+				tFleeDestination = transform.position + tFleeDirection;
+			}
+
+			m_tNavMesh.SetDestination(tFleeDestination);
+		}
 	}
 
 	void Attack()
@@ -204,8 +217,6 @@ public class LivingBeing : MonoBehaviour
 		}
 	}
 
-	#region Methods
-
 	public void ReceiveDamage(float fDamages, GameObject pAttacker)
 	{
 		m_fHealth -= fDamages;
@@ -213,7 +224,8 @@ public class LivingBeing : MonoBehaviour
 		if (m_fHealth <= 0.0f)
 			m_bAlive = false;
 
-		else if (m_eBehaviour == Behaviour.Coward ||
+		else if (m_eBehaviour == Behaviour.Neutral ||
+				 m_eBehaviour == Behaviour.Coward ||
 				 m_eBehaviour == Behaviour.Defensive)
 			m_pTarget = pAttacker;
 
@@ -228,11 +240,11 @@ public class LivingBeing : MonoBehaviour
 
 	bool IsTargetVisible()
 	{
-		int iObstaclesLayer = s_iObstaclesRaycastLayer | (m_bOpenedFire ? 0 : s_iShootRaycastLayer);	// Make sure no one is between target and himself before opening fire
+		int iObstaclesLayer = s_iObstaclesRaycastLayer | (m_bOpenedFire ? 0 : s_iShootRaycastLayer);	// Make sure no one is between target and himself before opening fire (and not after)
 		RaycastHit Hit;
 		bool bIsVisible = !Physics.Linecast(transform.position, m_pTarget.transform.position, out Hit, iObstaclesLayer, QueryTriggerInteraction.Ignore) || Hit.collider.gameObject == m_pTarget;
 
-		return IsTargetInRange(m_fShootRange) && bIsVisible;
+		return IsTargetInRange(m_fAttackRange) && bIsVisible;
 	}
 
 	bool IsTargetInRange(float fRange)

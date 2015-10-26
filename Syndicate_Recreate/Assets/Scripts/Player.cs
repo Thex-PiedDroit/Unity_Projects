@@ -46,7 +46,7 @@ public class Player : LivingBeing
 
 			if (m_bSelected)
 			{
-				if (Input.GetButtonDown("Submit"))
+				if (Input.GetButton("Submit"))
 				{
 					if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
 					{
@@ -61,7 +61,7 @@ public class Player : LivingBeing
 								tSphereTest.SetActive(true);
 								tSphereTest.transform.position = Hit.point;
 
-								if (Hit.collider.tag == "Target")
+								if (Hit.collider.gameObject.GetComponent<LivingBeing>() != null)
 								{
 									m_pTarget = Hit.collider.gameObject;
 									m_tNavMesh.destination = m_pTarget.transform.position;
@@ -132,5 +132,10 @@ public class Player : LivingBeing
 		{
 			tTrigger.gameObject.GetComponent<BuildingBehaviour>().ToggleFloorsAboveRenderers();
 		}
+	}
+
+	void OnDestroy()
+	{
+		MissionManager.CharacterDead();
 	}
 }

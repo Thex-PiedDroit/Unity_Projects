@@ -30,16 +30,20 @@ public class AI : LivingBeing
 		{
 			switch(m_eBehaviour)
 			{
+			case Behaviour.Coward:
+
+				if (!m_pTarget)
+					m_pTarget = SearchTarget();
+				break;
+
 			case Behaviour.Agressive:
 
 				m_pTarget = SearchTarget();
-
 				break;
 
 			case Behaviour.Ally:
 
 				m_pTarget = GetPlayerTarget();
-
 				break;
 			}
 
@@ -57,7 +61,7 @@ public class AI : LivingBeing
 	{
 		GameObject pTarget = null;
 
-		float fNearestCharacterSqrdDist = m_fSightRange;
+		float fNearestCharacterSqrdDist = m_eBehaviour == Behaviour.Coward ? m_fAttackRange : m_fSightRange;
 		fNearestCharacterSqrdDist *= fNearestCharacterSqrdDist;
 
 		foreach (GameObject tCharacter in s_pPlayerCharacters)
@@ -84,5 +88,18 @@ public class AI : LivingBeing
 		return null;
 	}
 
+
+	static public void ClearCharactersArray()
+	{
+		s_pPlayerCharacters = null;
+	}
+
 	#endregion
+
+
+	void OnDestroy()
+	{
+		if (gameObject.tag == "Target")
+			MissionManager.TargetDead();
+	}
 }
