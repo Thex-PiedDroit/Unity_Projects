@@ -13,10 +13,22 @@ public class Blip : MonoBehaviour
 	private Texture m_tDefaultBlip;
 	[SerializeField]
 	private Texture m_tOutOfBordersBlip;
+
+	[SerializeField]
+	private ForwardUpdate m_eForwardUpdateFrequency = ForwardUpdate.Once;
+	[SerializeField]
+	private bool m_bLockScreenRotation = false;
 	
 	#endregion
 	
 	#region Variables (private)
+
+	private enum ForwardUpdate
+	{
+		Once,
+		IfOutBorders,
+		Always
+	}
 
 	static private MiniMap s_pMinimap;
 
@@ -37,6 +49,8 @@ public class Blip : MonoBehaviour
 		m_tRawImage = GetComponent<RawImage>();
 		Vector3 tCurrentScale = m_tRectTransform.localScale;
 		m_tRectTransform.localScale = new Vector3(tCurrentScale.x * s_pMinimap.m_fZoom, tCurrentScale.y * s_pMinimap.m_fZoom, 1.0f);
+
+		UpdateForward();
 	}
 	
 	void LateUpdate()
@@ -45,8 +59,7 @@ public class Blip : MonoBehaviour
 		{
 			Vector2 tNewLocalPos = s_pMinimap.GetBlipLocalPosition(m_pTarget.position);
 
-			if (m_pTarget.gameObject.tag == "Target" ||
-				m_pTarget.gameObject.tag == "EscapePoint")
+			if (m_eForwardUpdateFrequency != ForwardUpdate.Once)
 			{
 				Vector2 tScaledSize = m_tRectTransform.rect.size;
 				tScaledSize.Scale(m_tRectTransform.localScale);
@@ -60,14 +73,17 @@ public class Blip : MonoBehaviour
 					m_tRectTransform.up = tTargetDirection;
 				}
 
+				else if (m_eForwardUpdateFrequency == ForwardUpdate.Always)
+					UpdateForward();
+
 				else
 					m_tRawImage.texture = m_tDefaultBlip;
 
 				tNewLocalPos = tClampedPos;
 			}
 
-			else
-				m_tRectTransform.up = new Vector2(m_pTarget.transform.forward.x, m_pTarget.transform.forward.z);
+			if (!m_bLockScreenRotation)
+				m_tRectTransform.localEulerAngles = s_pMinimap.TransformRotation(m_pTarget.eulerAngles);
 
 			m_tRectTransform.localPosition = tNewLocalPos;
 		}
@@ -78,6 +94,11 @@ public class Blip : MonoBehaviour
 
 
 	#region Methods
+
+	void UpdateForward()
+	{
+		transform.up = new Vector2(m_pTarget.transform.forward.x, m_pTarget.transform.forward.z);
+	}
 
 	static public void ClearMinimapLink()
 	{
