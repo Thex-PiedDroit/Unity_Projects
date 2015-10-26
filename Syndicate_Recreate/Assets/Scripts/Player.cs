@@ -54,7 +54,7 @@ public class Player : LivingBeing
 
 						RaycastHit Hit;
 
-						if (Physics.Raycast(tMousePos, Camera.main.transform.forward, out Hit, float.MaxValue, ~s_iObstaclesRaycastLayer, QueryTriggerInteraction.Ignore))
+						if (Physics.Raycast(tMousePos, Camera.main.transform.forward, out Hit, float.MaxValue, ~s_iObstaclesLayer, QueryTriggerInteraction.Ignore))
 						{
 							if (Hit.collider.tag != "UI")
 							{

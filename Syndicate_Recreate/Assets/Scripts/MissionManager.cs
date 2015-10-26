@@ -15,6 +15,9 @@ public class MissionManager : MonoBehaviour
 	private GameObject tMissionFailedScreen;
 	[SerializeField]
 	private GameObject tHUD;
+
+	[SerializeField]
+	private GameObject tEscapePointMinimapBlip;
 	
 	#endregion
 	
@@ -49,6 +52,8 @@ public class MissionManager : MonoBehaviour
 		m_iRemainingTargets = pTargets.Length;
 
 		m_iCharactersAlive = GameObject.FindGameObjectsWithTag("PlayerCharacter").Length;
+
+		tEscapePointMinimapBlip.SetActive(false);
 	}
 
 	void Update()
@@ -59,6 +64,7 @@ public class MissionManager : MonoBehaviour
 			if (Input.anyKeyDown)
 			{
 				AI.ClearCharactersArray();
+				Blip.ClearMinimapLink();
 
 				Application.LoadLevel("Main_Title");
 			}
@@ -101,7 +107,7 @@ public class MissionManager : MonoBehaviour
 			pThis.m_iRemainingTargets--;
 
 			if (pThis.m_iRemainingTargets <= 0)
-				pThis.m_bMissionSucceeded = true;
+				pThis.ToggleMissionSucceeded();
 			break;
 
 		case MissionType.Persuade:
@@ -127,6 +133,12 @@ public class MissionManager : MonoBehaviour
 		pThis.tMissionFailedScreen.SetActive(!bSuccess);
 	}
 
+	void ToggleMissionSucceeded()
+	{
+		m_bMissionSucceeded = true;
+		tEscapePointMinimapBlip.SetActive(true);
+	}
+
 
 	void OnCollisionEnter(Collision tCollider)
 	{
@@ -145,7 +157,7 @@ public class MissionManager : MonoBehaviour
 				Assert.IsTrue(m_iRemainingTargets >= 0);
 
 				if (m_iRemainingTargets == 0)
-					m_bMissionSucceeded = true;
+					ToggleMissionSucceeded();
 				break;
 			}
 		}

@@ -57,8 +57,8 @@ public class LivingBeing : MonoBehaviour
 
 	protected GameObject m_pTarget = null;
 
-	static protected int s_iShootRaycastLayer = ~(1 << 9);
-	static protected int s_iObstaclesRaycastLayer = 1 << 8;
+	static protected int s_iAllButGroundLayer = ~(1 << 9);
+	static protected int s_iObstaclesLayer = 1 << 8;
 
 	#endregion
 
@@ -183,7 +183,7 @@ public class LivingBeing : MonoBehaviour
 		{
 			RaycastHit Hit;
 
-			if (Physics.Linecast(transform.position, m_pTarget.transform.position, out Hit, s_iShootRaycastLayer, QueryTriggerInteraction.Ignore))
+			if (Physics.Linecast(transform.position, m_pTarget.transform.position, out Hit, s_iAllButGroundLayer, QueryTriggerInteraction.Ignore))
 			{
 				Debug.DrawLine(transform.position, Hit.point, Color.red);
 
@@ -202,7 +202,7 @@ public class LivingBeing : MonoBehaviour
 		Vector3 tCapsulePoint1 = transform.position - (transform.up * (m_tCapsuleCollider.height / 4.0f));
 		Vector3 tCapsulePoint2 = transform.position + (transform.up * (m_tCapsuleCollider.height / 4.0f));
 
-		bool bObstacleInSight = Physics.CapsuleCast(tCapsulePoint1, tCapsulePoint2, m_tCapsuleCollider.radius, -Camera.main.transform.forward, Camera.main.farClipPlane, s_iObstaclesRaycastLayer, QueryTriggerInteraction.Ignore);
+		bool bObstacleInSight = Physics.CapsuleCast(tCapsulePoint1, tCapsulePoint2, m_tCapsuleCollider.radius, -Camera.main.transform.forward, Camera.main.farClipPlane, s_iObstaclesLayer, QueryTriggerInteraction.Ignore);
 
 		if (bObstacleInSight && (m_tMeshRenderer.material != m_pMaterialTransp))
 		{
@@ -240,7 +240,7 @@ public class LivingBeing : MonoBehaviour
 
 	bool IsTargetVisible()
 	{
-		int iObstaclesLayer = s_iObstaclesRaycastLayer | (m_bOpenedFire ? 0 : s_iShootRaycastLayer);	// Make sure no one is between target and himself before opening fire (and not after)
+		int iObstaclesLayer = s_iObstaclesLayer | (m_bOpenedFire ? 0 : s_iAllButGroundLayer);	// Make sure no one is between target and himself before opening fire (and not after)
 		RaycastHit Hit;
 		bool bIsVisible = !Physics.Linecast(transform.position, m_pTarget.transform.position, out Hit, iObstaclesLayer, QueryTriggerInteraction.Ignore) || Hit.collider.gameObject == m_pTarget;
 
@@ -253,4 +253,14 @@ public class LivingBeing : MonoBehaviour
 	}
 
 	#endregion Methods
+
+
+	#region Getters/Setters
+
+	static public int GroundLayer
+	{
+		get { return ~s_iAllButGroundLayer; }
+	}
+
+	#endregion Getters/Setters
 }

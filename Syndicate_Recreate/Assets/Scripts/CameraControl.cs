@@ -6,7 +6,7 @@ public class CameraControl : MonoBehaviour
 	#region Variables (public)
 
 	[SerializeField]
-	float m_fCameraSpeed = 60.0f;
+	private float m_fCameraSpeed = 60.0f;
 	
 	#endregion
 	
@@ -18,7 +18,7 @@ public class CameraControl : MonoBehaviour
 	#endregion
 
 
-	void Start ()
+	void Awake()
 	{
 		m_tMoveForward = transform.forward;
 		m_tMoveForward.y = 0.0f;
@@ -29,7 +29,7 @@ public class CameraControl : MonoBehaviour
 		m_tMoveRight.Normalize();
 	}
 	
-	void Update ()
+	void Update()
 	{
 		float fVertical = Input.GetAxis("Vertical");
 		float fHorizontal = Input.GetAxis("Horizontal");
