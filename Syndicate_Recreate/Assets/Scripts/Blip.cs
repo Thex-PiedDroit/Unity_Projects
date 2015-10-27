@@ -23,7 +23,7 @@ public class Blip : MonoBehaviour
 	
 	#region Variables (private)
 
-	private enum ForwardUpdate
+	public enum ForwardUpdate
 	{
 		Once,
 		IfOutBorders,
@@ -119,6 +119,11 @@ public class Blip : MonoBehaviour
 			if (m_pTarget.GetComponentInChildren<LivingBeing>() != null)
 				m_bTargetIsLivingBeing = true;
 		}
+	}
+
+	public ForwardUpdate ForwardUpdateFrequency
+	{
+		set { m_eForwardUpdateFrequency = value; }
 	}
 
 	#endregion Getters/Setters

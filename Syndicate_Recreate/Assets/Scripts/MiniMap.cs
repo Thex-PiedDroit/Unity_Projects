@@ -57,7 +57,7 @@ public class MiniMap : MonoBehaviour
 		foreach (GameObject tBuilding in pBuildings)
 		{
 			pBlips.Add(Instantiate<GameObject>(tBuildingBlip));
-			pBlips[iBlipsCount].name = "BuildingBlip";
+			pBlips[iBlipsCount].name = tBuildingBlip.name;
 			pBlips[iBlipsCount].GetComponent<Blip>().Target = tBuilding.transform;
 
 			RectTransform tBlipTransform = pBlips[iBlipsCount].GetComponent<RectTransform>();
@@ -72,7 +72,7 @@ public class MiniMap : MonoBehaviour
 		foreach (GameObject tWall in pWalls)
 		{
 			pBlips.Add(Instantiate<GameObject>(tBuildingBlip));
-			pBlips[iBlipsCount].name = "BuildingBlip";
+			pBlips[iBlipsCount].name = tBuildingBlip.name;
 			pBlips[iBlipsCount].GetComponent<Blip>().Target = tWall.transform;
 
 			RectTransform tBlipTransform = pBlips[iBlipsCount].GetComponent<RectTransform>();
@@ -96,19 +96,23 @@ public class MiniMap : MonoBehaviour
 			case "GoodGuys":
 
 				pBlips.Add(Instantiate<GameObject>(tBlueBlip));
-				pBlips[iBlipsCount].name = "BlueBlip";
+				pBlips[iBlipsCount].name = tBlueBlip.name;
 				break;
 
 			case "BadGuys":
 
 				pBlips.Add(Instantiate<GameObject>(tRedBlip));
-				pBlips[iBlipsCount].name = "RedBlip";
+				pBlips[iBlipsCount].name = tRedBlip.name;
+
+				//print(pLivingBeings[i].gameObject.tag);
+				if (pLivingBeings[i].gameObject.tag == "Target")
+					pBlips[iBlipsCount].GetComponent<Blip>().ForwardUpdateFrequency = Blip.ForwardUpdate.IfOutBorders;
 				break;
 
 			case "Civilians":
 
 				pBlips.Add(Instantiate<GameObject>(tOrangeBlip));
-				pBlips[iBlipsCount].name = "OrangeBlip";
+				pBlips[iBlipsCount].name = tOrangeBlip.name;
 				break;
 			}
 

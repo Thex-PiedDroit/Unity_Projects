@@ -41,8 +41,11 @@ public class Player : LivingBeing
 	{
 		if (m_bAlive)
 		{
-			if (tSphereTest.activeInHierarchy && !m_tNavMesh.hasPath)
+			if (tSphereTest.activeInHierarchy && !m_tNavMeshAgent.hasPath)
+			{
+				tSphereTest.transform.parent = transform;
 				tSphereTest.SetActive(false);
+			}
 
 			if (m_bSelected)
 			{
@@ -60,17 +63,18 @@ public class Player : LivingBeing
 							{
 								tSphereTest.SetActive(true);
 								tSphereTest.transform.position = Hit.point;
+								tSphereTest.transform.parent = Hit.collider.transform;
 
 								if (Hit.collider.gameObject.GetComponent<LivingBeing>() != null)
 								{
 									m_pTarget = Hit.collider.gameObject;
-									m_tNavMesh.destination = m_pTarget.transform.position;
+									m_tNavMeshAgent.destination = m_pTarget.transform.position;
 								}
 
 								else
 								{
 									m_pTarget = null;
-									m_tNavMesh.destination = Hit.point;
+									m_tNavMeshAgent.destination = Hit.point;
 								}
 							}
 						}
@@ -92,8 +96,8 @@ public class Player : LivingBeing
 			{
 				MissionManager.CharacterDead();
 				transform.forward = Vector3.down;
-				m_tNavMesh.destination = transform.position;
-				m_tNavMesh.Stop();
+				m_tNavMeshAgent.destination = transform.position;
+				m_tNavMeshAgent.Stop();
 			}
 		}
 

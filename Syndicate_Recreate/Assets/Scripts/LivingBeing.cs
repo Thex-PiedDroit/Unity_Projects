@@ -53,12 +53,12 @@ public class LivingBeing : MonoBehaviour
 	private MeshRenderer m_tForwardCubeMeshRenderer;
 	private CapsuleCollider m_tCapsuleCollider;
 
-	protected NavMeshAgent m_tNavMesh;
+	protected NavMeshAgent m_tNavMeshAgent;
 
 	protected GameObject m_pTarget = null;
 
 	static protected int s_iAllButGroundLayer = ~(1 << 9);
-	static protected int s_iObstaclesLayer = 1 << 8;
+	static protected int s_iObstaclesLayer = 1 << 8 | 1 << 10;
 
 	#endregion
 
@@ -79,8 +79,8 @@ public class LivingBeing : MonoBehaviour
 		m_tMeshRenderer = GetComponent<MeshRenderer>();
 		m_tForwardCubeMeshRenderer = transform.FindChild("Forward").gameObject.GetComponent<MeshRenderer>();
 		m_tCapsuleCollider = GetComponent<CapsuleCollider>();
-		m_tNavMesh = GetComponentInParent<NavMeshAgent>();
-		m_fDefaultSpeed = m_tNavMesh.speed;
+		m_tNavMeshAgent = GetComponentInParent<NavMeshAgent>();
+		m_fDefaultSpeed = m_tNavMeshAgent.speed;
 	}
 
 	protected void BehaviourUpdate()
@@ -103,6 +103,12 @@ public class LivingBeing : MonoBehaviour
 				Flee();
 				break;
 			}
+
+			if (m_pTarget.GetComponent<LivingBeing>().IsDead)
+			{
+				m_pTarget = null;
+				m_bOpenedFire = false;
+			}
 		}
 
 		CheckCameraVisibility();
@@ -115,19 +121,13 @@ public class LivingBeing : MonoBehaviour
 	{
 		if (IsTargetVisible())
 		{
-			if (m_tNavMesh.hasPath)
+			if (m_tNavMeshAgent.hasPath)
 			{
-				m_tNavMesh.destination = transform.position;
+				m_tNavMeshAgent.destination = transform.position;
 				m_bOpenedFire = true;
 			}
 
 			Attack();
-
-			if (m_pTarget.GetComponent<LivingBeing>().IsDead)
-			{
-				m_pTarget = null;
-				m_bOpenedFire = false;
-			}
 		}
 
 		else
@@ -135,16 +135,16 @@ public class LivingBeing : MonoBehaviour
 			if (m_eBehaviour != Behaviour.Player)
 			{
 				if (IsTargetInRange(m_fSightRange))
-					m_tNavMesh.destination = m_pTarget.transform.position;
+					m_tNavMeshAgent.destination = m_pTarget.transform.position;
 				else
 				{
-					m_tNavMesh.destination = transform.position;
+					m_tNavMeshAgent.destination = transform.position;
 					m_pTarget = null;
 				}
 			}
 
 			else
-				m_tNavMesh.destination = m_pTarget.transform.position;
+				m_tNavMeshAgent.destination = m_pTarget.transform.position;
 			
 			m_bOpenedFire = false;
 		}
@@ -152,16 +152,16 @@ public class LivingBeing : MonoBehaviour
 
 	void Flee()
 	{
-		m_tNavMesh.speed = m_fDefaultSpeed * 2.0f;
+		m_tNavMeshAgent.speed = m_fDefaultSpeed * 2.0f;
 
 		if (tag != "Target" && !IsTargetInRange(m_fSightRange))
 		{
 			m_pTarget = null;
-			m_tNavMesh.destination = transform.position;
-			m_tNavMesh.speed = m_fDefaultSpeed;
+			m_tNavMeshAgent.destination = transform.position;
+			m_tNavMeshAgent.speed = m_fDefaultSpeed;
 		}
 
-		else if (!m_tNavMesh.hasPath)
+		else if (!m_tNavMeshAgent.hasPath)
 		{
 			Vector3 tFleeDestination;
 
@@ -174,7 +174,7 @@ public class LivingBeing : MonoBehaviour
 				tFleeDestination = transform.position + tFleeDirection;
 			}
 
-			m_tNavMesh.SetDestination(tFleeDestination);
+			m_tNavMeshAgent.SetDestination(tFleeDestination);
 		}
 	}
 
@@ -263,6 +263,11 @@ public class LivingBeing : MonoBehaviour
 	static public int GroundLayer
 	{
 		get { return ~s_iAllButGroundLayer; }
+	}
+
+	static public int ObstaclesLayer
+	{
+		get { return s_iObstaclesLayer; }
 	}
 
 	#endregion Getters/Setters
