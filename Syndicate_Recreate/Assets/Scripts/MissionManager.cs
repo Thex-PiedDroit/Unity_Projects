@@ -30,7 +30,7 @@ public class MissionManager : MonoBehaviour
 	}
 
 
-	static private MissionManager pThis;
+	static private MissionManager s_pThis;
 
 	private GameObject[] pTargets;
 
@@ -46,7 +46,7 @@ public class MissionManager : MonoBehaviour
 
 	void Start()
 	{
-		pThis = this;
+		s_pThis = this;
 
 		pTargets = GameObject.FindGameObjectsWithTag("Target");
 		m_iRemainingTargets = pTargets.Length;
@@ -65,6 +65,7 @@ public class MissionManager : MonoBehaviour
 			{
 				AI.ClearCharactersArray();
 				Blip.ClearMinimapLink();
+				s_pThis = null;
 
 				Application.LoadLevel("Main_Title");
 			}
@@ -100,37 +101,43 @@ public class MissionManager : MonoBehaviour
 	
 	static public void TargetDead()
 	{
-		switch (pThis.m_eMissionType)
+		if (s_pThis)
 		{
-		case MissionType.Kill:
+			switch (s_pThis.m_eMissionType)
+			{
+			case MissionType.Kill:
 
-			pThis.m_iRemainingTargets--;
+				s_pThis.m_iRemainingTargets--;
 
-			if (pThis.m_iRemainingTargets <= 0)
-				pThis.ToggleMissionSucceeded();
-			break;
+				if (s_pThis.m_iRemainingTargets <= 0)
+					s_pThis.ToggleMissionSucceeded();
+				break;
 
-		case MissionType.Persuade:
+			case MissionType.Persuade:
 
-			EndMission(false);
-			break;
+				EndMission(false);
+				break;
+			}
 		}
 	}
 
 	static public void CharacterDead()
 	{
-		pThis.m_iCharactersAlive--;
-		Assert.IsTrue(pThis.m_iCharactersAlive >= 0);
+		if (s_pThis)
+		{
+			s_pThis.m_iCharactersAlive--;
+			Assert.IsTrue(s_pThis.m_iCharactersAlive >= 0);
 
-		if (pThis.m_iCharactersAlive == 0)
-			EndMission(false);
+			if (s_pThis.m_iCharactersAlive == 0)
+				EndMission(false);
+		}
 	}
 
 	static void EndMission(bool bSuccess)
 	{
-		pThis.tHUD.SetActive(false);
-		pThis.tMissionSucceededScreen.SetActive(bSuccess);
-		pThis.tMissionFailedScreen.SetActive(!bSuccess);
+		s_pThis.tHUD.SetActive(false);
+		s_pThis.tMissionSucceededScreen.SetActive(bSuccess);
+		s_pThis.tMissionFailedScreen.SetActive(!bSuccess);
 	}
 
 	void ToggleMissionSucceeded()

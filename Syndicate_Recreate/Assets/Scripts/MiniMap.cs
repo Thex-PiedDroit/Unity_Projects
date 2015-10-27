@@ -14,6 +14,8 @@ public class MiniMap : MonoBehaviour
 	[SerializeField]
 	private GameObject tRedBlip;
 	[SerializeField]
+	private GameObject tOrangeBlip;
+	[SerializeField]
 	private GameObject tBuildingBlip;
 	[SerializeField]
 	private Vector2 tBuildingsMeshSize = new Vector2(32.0f, 22.0f);
@@ -87,7 +89,7 @@ public class MiniMap : MonoBehaviour
 
 		for (int i = 0; i < pLivingBeingsComponents.Length; i++)
 		{
-			pLivingBeings[i] = pLivingBeingsComponents[i].gameObject;
+			pLivingBeings[i] = pLivingBeingsComponents[i].gameObject.transform.parent.gameObject;
 
 			switch(pLivingBeings[i].transform.parent.name)
 			{
@@ -101,6 +103,12 @@ public class MiniMap : MonoBehaviour
 
 				pBlips.Add(Instantiate<GameObject>(tRedBlip));
 				pBlips[iBlipsCount].name = "RedBlip";
+				break;
+
+			case "Civilians":
+
+				pBlips.Add(Instantiate<GameObject>(tOrangeBlip));
+				pBlips[iBlipsCount].name = "OrangeBlip";
 				break;
 			}
 

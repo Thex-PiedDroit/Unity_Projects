@@ -79,7 +79,7 @@ public class LivingBeing : MonoBehaviour
 		m_tMeshRenderer = GetComponent<MeshRenderer>();
 		m_tForwardCubeMeshRenderer = transform.FindChild("Forward").gameObject.GetComponent<MeshRenderer>();
 		m_tCapsuleCollider = GetComponent<CapsuleCollider>();
-		m_tNavMesh = GetComponent<NavMeshAgent>();
+		m_tNavMesh = GetComponentInParent<NavMeshAgent>();
 		m_fDefaultSpeed = m_tNavMesh.speed;
 	}
 
@@ -104,9 +104,6 @@ public class LivingBeing : MonoBehaviour
 				break;
 			}
 		}
-
-		else if (m_eBehaviour != Behaviour.Player)
-			m_tNavMesh.destination = transform.position;
 
 		CheckCameraVisibility();
 	}
@@ -135,13 +132,19 @@ public class LivingBeing : MonoBehaviour
 
 		else
 		{
-			if (IsTargetInRange(m_fSightRange))
-				m_tNavMesh.destination = m_pTarget.transform.position;
-			else if (m_eBehaviour != Behaviour.Player)
+			if (m_eBehaviour != Behaviour.Player)
 			{
-				m_tNavMesh.destination = transform.position;
-				m_pTarget = null;
+				if (IsTargetInRange(m_fSightRange))
+					m_tNavMesh.destination = m_pTarget.transform.position;
+				else
+				{
+					m_tNavMesh.destination = transform.position;
+					m_pTarget = null;
+				}
 			}
+
+			else
+				m_tNavMesh.destination = m_pTarget.transform.position;
 			
 			m_bOpenedFire = false;
 		}

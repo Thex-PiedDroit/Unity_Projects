@@ -88,10 +88,13 @@ public class Player : LivingBeing
 
 		else
 		{
-			transform.forward = Vector3.down;
-			m_tNavMesh.destination = transform.position;
-			m_tNavMesh.Stop();
-			tSphereTest.SetActive(false);
+			if (transform.forward != Vector3.down)
+			{
+				MissionManager.CharacterDead();
+				transform.forward = Vector3.down;
+				m_tNavMesh.destination = transform.position;
+				m_tNavMesh.Stop();
+			}
 		}
 
 		if (m_bJustTookDamage)
@@ -132,10 +135,5 @@ public class Player : LivingBeing
 		{
 			tTrigger.gameObject.GetComponent<BuildingBehaviour>().ToggleFloorsAboveRenderers();
 		}
-	}
-
-	void OnDestroy()
-	{
-		MissionManager.CharacterDead();
 	}
 }

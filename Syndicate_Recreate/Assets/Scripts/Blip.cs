@@ -88,7 +88,7 @@ public class Blip : MonoBehaviour
 			m_tRectTransform.localPosition = tNewLocalPos;
 		}
 
-		if (m_bTargetIsLivingBeing && m_pTarget.GetComponent<LivingBeing>().IsDead)
+		if (m_bTargetIsLivingBeing && m_pTarget.GetComponentInChildren<LivingBeing>().IsDead)
 			Destroy(gameObject);
 	}
 
@@ -116,7 +116,7 @@ public class Blip : MonoBehaviour
 		{
 			m_pTarget = value;
 
-			if (m_pTarget.GetComponent<LivingBeing>() != null)
+			if (m_pTarget.GetComponentInChildren<LivingBeing>() != null)
 				m_bTargetIsLivingBeing = true;
 		}
 	}
