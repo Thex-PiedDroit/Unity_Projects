@@ -48,6 +48,7 @@ public class LivingBeing : MonoBehaviour
 	protected bool m_bAlive = true;
 	protected float m_fHealth = 10.0f;
 	protected bool m_bJustTookDamage = false;
+	protected bool m_bPursuingTarget = false;
 
 	private MeshRenderer m_tMeshRenderer;
 	private MeshRenderer m_tForwardCubeMeshRenderer;
@@ -58,7 +59,8 @@ public class LivingBeing : MonoBehaviour
 	protected GameObject m_pTarget = null;
 
 	static protected int s_iAllButGroundLayer = ~(1 << 9);
-	static protected int s_iObstaclesLayer = 1 << 8 | 1 << 10;
+	static protected int s_iObstaclesLayer = 1 << 8;
+	static protected int s_iLivingBeingsLayer = 1 << 10;
 
 	#endregion
 
@@ -104,7 +106,7 @@ public class LivingBeing : MonoBehaviour
 				break;
 			}
 
-			if (m_pTarget.GetComponent<LivingBeing>().IsDead)
+			if (m_pTarget && m_pTarget.GetComponent<LivingBeing>().IsDead)
 			{
 				m_pTarget = null;
 				m_bOpenedFire = false;
@@ -119,7 +121,7 @@ public class LivingBeing : MonoBehaviour
 
 	void FollowTarget()
 	{
-		if (IsTargetVisible())
+		if (!m_bPursuingTarget && IsTargetVisible())
 		{
 			if (m_tNavMeshAgent.hasPath)
 			{
@@ -132,11 +134,15 @@ public class LivingBeing : MonoBehaviour
 
 		else
 		{
-			if (m_eBehaviour != Behaviour.Player)
+			if (m_eBehaviour != Behaviour.Player && !m_bPursuingTarget)
 			{
 				if (IsTargetInRange(m_fSightRange))
+				{
 					m_tNavMeshAgent.destination = m_pTarget.transform.position;
-				else
+					m_bPursuingTarget = false;
+				}
+
+				else if (!m_bPursuingTarget)
 				{
 					m_tNavMeshAgent.destination = transform.position;
 					m_pTarget = null;
@@ -180,7 +186,7 @@ public class LivingBeing : MonoBehaviour
 
 	void Attack()
 	{
-		transform.LookAt(m_pTarget.transform);
+		transform.parent.LookAt(m_pTarget.transform);
 
 		if (Time.fixedTime - m_fLastAttackTime >= m_fAttackSpeed)
 		{
@@ -193,7 +199,7 @@ public class LivingBeing : MonoBehaviour
 				LivingBeing tShotThing = Hit.collider.gameObject.GetComponent<LivingBeing>();
 
 				if (tShotThing)
-					tShotThing.ReceiveDamage(m_fDefaultDamages, gameObject);
+					tShotThing.ReceiveDamage(m_fDefaultDamages, gameObject.gameObject);
 			}
 
 			m_fLastAttackTime = Time.fixedTime;
@@ -235,12 +241,6 @@ public class LivingBeing : MonoBehaviour
 		m_bJustTookDamage = true;
 	}
 
-	public bool IsDead
-	{
-		get { return !m_bAlive; }
-	}
-
-
 	bool IsTargetVisible()
 	{
 		int iObstaclesLayer = s_iObstaclesLayer | (m_bOpenedFire ? 0 : s_iAllButGroundLayer);	// Make sure no one is between target and himself before opening fire (and not after)
@@ -250,7 +250,7 @@ public class LivingBeing : MonoBehaviour
 		return IsTargetInRange(m_fAttackRange) && bIsVisible;
 	}
 
-	bool IsTargetInRange(float fRange)
+	protected bool IsTargetInRange(float fRange)
 	{
 		return (transform.position - m_pTarget.transform.position).sqrMagnitude <= (fRange * fRange);
 	}
@@ -259,6 +259,16 @@ public class LivingBeing : MonoBehaviour
 
 
 	#region Getters/Setters
+
+	public bool IsDead
+	{
+		get { return !m_bAlive; }
+	}
+
+	public GameObject Target
+	{
+		get { return m_pTarget; }
+	}
 
 	static public int GroundLayer
 	{

@@ -10,6 +10,8 @@ public class MapGenerator : MonoBehaviour
 	[SerializeField]
 	private GameObject pBadGuy;
 	[SerializeField]
+	private bool m_bGenerate = true;
+	[SerializeField]
 	private Vector2 m_tCivAndBadGuysCountMinMax = new Vector2(150, 200);
 	[SerializeField]
 	private GameObject pCanvas;
@@ -26,43 +28,45 @@ public class MapGenerator : MonoBehaviour
 
 	void Awake()
 	{
-		pCiviliansContainer = GameObject.Find("Civilians").transform;
-		pBadGuysContainer = GameObject.Find("BadGuys").transform;
-
-		int iCiviliansRandCount = Random.Range((int)m_tCivAndBadGuysCountMinMax.x, (int)m_tCivAndBadGuysCountMinMax.y + 1);
-		float fRaycastOriginY = Camera.main.transform.position.y;
-
-		GameObject[] pCivAndBadGuys = new GameObject[iCiviliansRandCount];
-
-		for (int i = 0; i < iCiviliansRandCount; i++)
+		if (m_bGenerate)
 		{
-			bool bCivilian = Random.Range(0, 2) == 0;
+			pCiviliansContainer = GameObject.Find("Civilians").transform;
+			pBadGuysContainer = GameObject.Find("BadGuys").transform;
 
-			Vector3 tRandomSpawnPoint = Vector3.zero;
+			int iCiviliansRandCount = Random.Range((int)m_tCivAndBadGuysCountMinMax.x, (int)m_tCivAndBadGuysCountMinMax.y + 1);
 
-			bool bSpawnPointFound = false;
-			int iAttemps = 0;
+			GameObject[] pCivAndBadGuys = new GameObject[iCiviliansRandCount];
 
-			do
+			for (int i = 0; i < iCiviliansRandCount; i++)
 			{
-				tRandomSpawnPoint.x = Random.Range(-transform.localScale.x / 2.0f, transform.localScale.x / 2.0f);
-				tRandomSpawnPoint.y = 0.0f;
-				tRandomSpawnPoint.z = Random.Range(-transform.localScale.z / 2.0f, transform.localScale.z / 2.0f);
+				bool bCivilian = Random.Range(0, 2) == 0;
 
-				NavMeshHit Hit;
-				if (NavMesh.FindClosestEdge(tRandomSpawnPoint, out Hit, LivingBeing.ObstaclesLayer))
+				Vector3 tRandomSpawnPoint = Vector3.zero;
+
+				bool bSpawnPointFound = false;
+				int iAttemps = 0;
+
+				do
 				{
-					tRandomSpawnPoint = Hit.position;
-					bSpawnPointFound = true;
-				}
+					tRandomSpawnPoint.x = Random.Range(-transform.localScale.x / 2.0f, transform.localScale.x / 2.0f);
+					tRandomSpawnPoint.y = 0.0f;
+					tRandomSpawnPoint.z = Random.Range(-transform.localScale.z / 2.0f, transform.localScale.z / 2.0f);
 
-				iAttemps++;
+					NavMeshHit Hit;
+					if (NavMesh.FindClosestEdge(tRandomSpawnPoint, out Hit, LivingBeing.ObstaclesLayer))
+					{
+						tRandomSpawnPoint = Hit.position;
+						bSpawnPointFound = true;
+					}
 
-			} while (!bSpawnPointFound && iAttemps < 50);
+					iAttemps++;
 
-			pCivAndBadGuys[i] = Instantiate(bCivilian ? pCivilian : pBadGuy, tRandomSpawnPoint, Quaternion.identity) as GameObject;
-			pCivAndBadGuys[i].transform.parent = bCivilian ? pCiviliansContainer : pBadGuysContainer;
-			pCivAndBadGuys[i].name = bCivilian ? pCivilian.name : pBadGuy.name;
+				} while (!bSpawnPointFound && iAttemps < 50);
+
+				pCivAndBadGuys[i] = Instantiate(bCivilian ? pCivilian : pBadGuy, tRandomSpawnPoint, Quaternion.identity) as GameObject;
+				pCivAndBadGuys[i].transform.parent = bCivilian ? pCiviliansContainer : pBadGuysContainer;
+				pCivAndBadGuys[i].name = bCivilian ? pCivilian.name : pBadGuy.name;
+			}
 		}
 
 		pCanvas.SetActive(true);

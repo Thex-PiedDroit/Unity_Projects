@@ -60,11 +60,7 @@ public class AI : LivingBeing
 			switch (m_eBehaviour)
 			{
 			case Behaviour.Coward:
-
-				if (!m_pTarget)
-					m_pTarget = SearchTarget();
-				break;
-
+			case Behaviour.Defensive:
 			case Behaviour.Agressive:
 
 				m_pTarget = SearchTarget();
@@ -150,20 +146,68 @@ public class AI : LivingBeing
 	{
 		GameObject pTarget = null;
 
-		float fNearestCharacterSqrdDist = m_eBehaviour == Behaviour.Coward ? m_fAttackRange : m_fSightRange;
-		fNearestCharacterSqrdDist *= fNearestCharacterSqrdDist;
-
-		foreach (GameObject tCharacter in s_pPlayerCharacters)
+		switch (m_eBehaviour)
 		{
-			if (!tCharacter.GetComponentInChildren<LivingBeing>().IsDead)
+		case Behaviour.Coward:
+		case Behaviour.Agressive:
 			{
-				float fSqrdDist = (transform.position - tCharacter.transform.position).sqrMagnitude;
+				float fNearestCharacterSqrdDist = m_eBehaviour == Behaviour.Coward ? m_fAttackRange : m_fSightRange;
+				fNearestCharacterSqrdDist *= fNearestCharacterSqrdDist;
 
-				if (fSqrdDist < fNearestCharacterSqrdDist)
+				foreach (GameObject tCharacter in s_pPlayerCharacters)
 				{
-					pTarget = tCharacter;
-					fNearestCharacterSqrdDist = fSqrdDist;
+					if (!tCharacter.GetComponentInChildren<LivingBeing>().IsDead)
+					{
+						float fSqrdDist = (transform.position - tCharacter.transform.position).sqrMagnitude;
+
+						if (fSqrdDist < fNearestCharacterSqrdDist)
+						{
+							pTarget = tCharacter.gameObject;
+							fNearestCharacterSqrdDist = fSqrdDist;
+						}
+					}
 				}
+
+				break;
+			}
+
+		case Behaviour.Defensive:
+			{
+				Collider[] pLivingBeingsInSight = Physics.OverlapSphere(transform.position, m_fSightRange, s_iLivingBeingsLayer);
+
+				if (pLivingBeingsInSight.Length <= 1)
+					m_bPursuingTarget = false;
+
+				else
+				{
+					foreach (Collider tLivingBeingCollider in pLivingBeingsInSight)
+					{
+						LivingBeing tLivingBeing = tLivingBeingCollider.gameObject.GetComponent<LivingBeing>();
+
+						if (tLivingBeing.Target != null)
+						{
+							if (!m_bPursuingTarget)
+							{
+								if (tLivingBeing.gameObject.tag != "PlayerCharacter")
+								{
+									m_pTarget = tLivingBeing.Target;
+									m_bPursuingTarget = true;
+								}
+
+								else
+									pTarget = tLivingBeing.gameObject;
+							}
+
+							else
+								pTarget = m_pTarget;
+						}
+
+						else if (m_bPursuingTarget || (m_pTarget && IsTargetInRange(m_fSightRange)))
+							pTarget = m_pTarget;
+					}
+				}
+
+				break;
 			}
 		}
 

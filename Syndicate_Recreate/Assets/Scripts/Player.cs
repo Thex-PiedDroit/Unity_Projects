@@ -47,6 +47,9 @@ public class Player : LivingBeing
 				tSphereTest.SetActive(false);
 			}
 
+			if (m_pTarget && m_pTarget.GetComponent<LivingBeing>().IsDead)
+				tSphereTest.transform.parent = transform;
+
 			if (m_bSelected)
 			{
 				if (Input.GetButton("Submit"))
