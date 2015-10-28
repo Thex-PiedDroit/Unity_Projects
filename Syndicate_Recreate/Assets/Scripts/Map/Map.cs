@@ -23,8 +23,8 @@ public class Map : MonoBehaviour
 	private Transform pCiviliansContainer;
 	private Transform pBadGuysContainer;
 
-	static protected int s_iAllButGroundLayer = 1 << 9;
-	static protected int s_iObstaclesLayer = 1 << 8;
+	static protected int s_iGroundLayer = 1 << LayerMask.NameToLayer("Ground");
+	static protected int s_iObstaclesLayer = 1 << LayerMask.NameToLayer("Obstacle");
 	
 	#endregion
 
@@ -80,12 +80,12 @@ public class Map : MonoBehaviour
 
 	static public int GroundLayer
 	{
-		get { return s_iAllButGroundLayer; }
+		get { return s_iGroundLayer; }
 	}
 
 	static public int AllButGroundLayer
 	{
-		get { return ~s_iAllButGroundLayer; }
+		get { return ~s_iGroundLayer; }
 	}
 
 	static public int ObstaclesLayer

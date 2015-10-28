@@ -40,16 +40,14 @@ public class LivingBeing : MonoBehaviour
 
 	protected GameObject m_pTarget = null;
 
-	static protected int s_iLivingBeingsLayer = 1 << 10;
-	static protected int s_iDeadsLayers = 1 << 11;
+	static protected int s_iLivingBeingsLayer = 1 << LayerMask.NameToLayer("LivingBeing");
+	static protected int s_iDeadsLayers = 1 << LayerMask.NameToLayer("Dead");
 
 	#endregion
 
 	#region Variables (private)
 
 	private float m_fDefaultSpeed;
-	
-	private bool m_bOpenedFire = false;
 	
 	#endregion
 
@@ -92,10 +90,7 @@ public class LivingBeing : MonoBehaviour
 			}
 
 			if (m_pTarget && m_pTarget.GetComponent<LivingBeing>().IsDead)
-			{
 				m_pTarget = null;
-				m_bOpenedFire = false;
-			}
 		}
 	}
 
@@ -104,7 +99,7 @@ public class LivingBeing : MonoBehaviour
 		m_fHealth = 0.0f;
 		m_bAlive = false;
 		m_pTarget = null;
-		gameObject.layer = 11;
+		gameObject.layer = LayerMask.NameToLayer("Dead");
 		transform.forward = Vector3.down;
 		m_tNavMeshAgent.destination = transform.position;
 	}
@@ -117,10 +112,7 @@ public class LivingBeing : MonoBehaviour
 		if (IsTargetVisible())
 		{
 			if (m_tNavMeshAgent.hasPath)
-			{
 				m_tNavMeshAgent.destination = transform.position;
-				m_bOpenedFire = true;
-			}
 
 			Attack();
 		}
@@ -144,8 +136,6 @@ public class LivingBeing : MonoBehaviour
 
 			else
 				m_tNavMeshAgent.destination = m_pTarget.transform.position;
-			
-			m_bOpenedFire = false;
 		}
 	}
 
