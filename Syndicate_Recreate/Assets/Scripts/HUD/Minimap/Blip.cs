@@ -59,6 +59,8 @@ public class Blip : MonoBehaviour
 		{
 			Vector2 tNewLocalPos = s_pMinimap.GetBlipLocalPosition(m_pTarget.position);
 
+			bool bOutOfBorders = false;
+
 			if (m_eForwardUpdateFrequency != ForwardUpdate.Once)
 			{
 				Vector2 tScaledSize = m_tRectTransform.rect.size;
@@ -71,6 +73,8 @@ public class Blip : MonoBehaviour
 
 					Vector2 tTargetDirection = (tNewLocalPos - tClampedPos).normalized;
 					m_tRectTransform.up = tTargetDirection;
+
+					bOutOfBorders = true;
 				}
 
 				else if (m_eForwardUpdateFrequency == ForwardUpdate.Always)
@@ -82,7 +86,7 @@ public class Blip : MonoBehaviour
 				tNewLocalPos = tClampedPos;
 			}
 
-			if (!m_bLockScreenRotation)
+			if (!m_bLockScreenRotation && !bOutOfBorders)
 				m_tRectTransform.localEulerAngles = s_pMinimap.TransformRotation(m_pTarget.eulerAngles);
 
 			m_tRectTransform.localPosition = tNewLocalPos;

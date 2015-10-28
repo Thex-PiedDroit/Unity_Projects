@@ -6,8 +6,6 @@ public class Player : LivingBeing
 	#region Variables (public)
 
 	[Header("HUD")]
-	[SerializeField]
-	private GameObject tSphereTest;
 
 	[SerializeField]
 	private GameObject tSelectedGizmo;
@@ -25,11 +23,6 @@ public class Player : LivingBeing
 	#endregion
 
 
-	void Awake ()
-	{
-		tSphereTest.SetActive(false);
-	}
-
 	void Start()
 	{
 		base.BehaviourStart();
@@ -41,14 +34,8 @@ public class Player : LivingBeing
 	{
 		if (m_bAlive)
 		{
-			if (tSphereTest.activeInHierarchy && !m_tNavMeshAgent.hasPath)
-			{
-				tSphereTest.transform.parent = transform;
-				tSphereTest.SetActive(false);
-			}
-
-			if (m_pTarget && m_pTarget.GetComponent<LivingBeing>().IsDead)
-				tSphereTest.transform.parent = transform;
+			if (m_tNavMeshAgent.hasPath)
+				Debug.DrawLine(transform.position, m_tNavMeshAgent.destination, Color.magenta);
 
 			if (m_bSelected)
 			{
@@ -60,14 +47,10 @@ public class Player : LivingBeing
 
 						RaycastHit Hit;
 
-						if (Physics.Raycast(tMousePos, Camera.main.transform.forward, out Hit, float.MaxValue, ~s_iObstaclesLayer, QueryTriggerInteraction.Ignore))
+						if (Physics.Raycast(tMousePos, Camera.main.transform.forward, out Hit, float.MaxValue, Map.AllButObstaclesLayer, QueryTriggerInteraction.Ignore))
 						{
 							if (Hit.collider.tag != "UI")
 							{
-								tSphereTest.SetActive(true);
-								tSphereTest.transform.position = Hit.point;
-								tSphereTest.transform.parent = Hit.collider.transform;
-
 								if (Hit.collider.gameObject.GetComponent<LivingBeing>() != null)
 								{
 									m_pTarget = Hit.collider.gameObject;

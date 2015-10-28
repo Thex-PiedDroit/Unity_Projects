@@ -151,8 +151,7 @@ public class AI : LivingBeing
 		case Behaviour.Coward:
 		case Behaviour.Agressive:
 			{
-				float fNearestCharacterSqrdDist = m_eBehaviour == Behaviour.Coward ? m_fAttackRange : m_fSightRange;
-				fNearestCharacterSqrdDist *= fNearestCharacterSqrdDist;
+				float fNearestCharacterSqrdDist = m_fSightRange * m_fSightRange;
 
 				foreach (GameObject tCharacter in s_pPlayerCharacters)
 				{

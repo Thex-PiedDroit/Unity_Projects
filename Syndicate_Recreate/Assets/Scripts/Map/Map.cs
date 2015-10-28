@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MapGenerator : MonoBehaviour
+public class Map : MonoBehaviour
 {
 	#region Variables (public)
 
@@ -22,6 +22,9 @@ public class MapGenerator : MonoBehaviour
 
 	private Transform pCiviliansContainer;
 	private Transform pBadGuysContainer;
+
+	static protected int s_iAllButGroundLayer = ~(1 << 9);
+	static protected int s_iObstaclesLayer = 1 << 8;
 	
 	#endregion
 
@@ -53,7 +56,7 @@ public class MapGenerator : MonoBehaviour
 					tRandomSpawnPoint.z = Random.Range(-transform.localScale.z / 2.0f, transform.localScale.z / 2.0f);
 
 					NavMeshHit Hit;
-					if (NavMesh.FindClosestEdge(tRandomSpawnPoint, out Hit, LivingBeing.ObstaclesLayer))
+					if (NavMesh.FindClosestEdge(tRandomSpawnPoint, out Hit, Map.ObstaclesLayer))
 					{
 						tRandomSpawnPoint = Hit.position;
 						bSpawnPointFound = true;
@@ -71,6 +74,31 @@ public class MapGenerator : MonoBehaviour
 
 		pCanvas.SetActive(true);
 	}
+
+
+	#region Getters/Setters
+
+	static public int AllButGroundLayer
+	{
+		get { return s_iAllButGroundLayer; }
+	}
+
+	static public int GroundLayer
+	{
+		get { return ~s_iAllButGroundLayer; }
+	}
+
+	static public int ObstaclesLayer
+	{
+		get { return s_iObstaclesLayer; }
+	}
+
+	static public int AllButObstaclesLayer
+	{
+		get { return ~s_iObstaclesLayer; }
+	}
+
+	#endregion Getters/Setters
 
 
 	void OnApplicationQuit()
