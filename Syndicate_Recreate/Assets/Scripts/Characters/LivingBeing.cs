@@ -41,6 +41,7 @@ public class LivingBeing : MonoBehaviour
 	protected GameObject m_pTarget = null;
 
 	static protected int s_iLivingBeingsLayer = 1 << 10;
+	static protected int s_iDeadsLayers = 1 << 11;
 
 	#endregion
 
@@ -53,7 +54,7 @@ public class LivingBeing : MonoBehaviour
 	#endregion
 
 
-	protected void BehaviourStart()
+	protected virtual void Start()
 	{
 		if (m_pActiveWeapon)
 		{
@@ -66,7 +67,7 @@ public class LivingBeing : MonoBehaviour
 		m_fDefaultSpeed = m_tNavMeshAgent.speed;
 	}
 
-	protected void BehaviourUpdate()
+	protected virtual void Update()
 	{
 		if (m_pTarget)
 		{
@@ -98,12 +99,22 @@ public class LivingBeing : MonoBehaviour
 		}
 	}
 
+	protected virtual void OnDeath()
+	{
+		m_fHealth = 0.0f;
+		m_bAlive = false;
+		m_pTarget = null;
+		gameObject.layer = 11;
+		transform.forward = Vector3.down;
+		m_tNavMeshAgent.destination = transform.position;
+	}
+
 
 	#region Methods
 
 	void FollowTarget()
 	{
-		if (!m_bPursuingTarget || IsTargetVisible())
+		if (IsTargetVisible())
 		{
 			if (m_tNavMeshAgent.hasPath)
 			{
@@ -175,14 +186,18 @@ public class LivingBeing : MonoBehaviour
 
 	public void ReceiveDamage(float fDamages, GameObject pAttacker)
 	{
+		if (pAttacker.GetComponent<Player>() != null && m_eBehaviour == Behaviour.Player)
+			fDamages = 0.0f;	// So characters can "argue" safely when one shoots another by mistake
+
 		m_fHealth -= fDamages;
 
 		if (m_fHealth <= 0.0f)
-			m_bAlive = false;
+			OnDeath();
 
 		else if (m_eBehaviour == Behaviour.Neutral ||
 				 m_eBehaviour == Behaviour.Coward ||
-				 m_eBehaviour == Behaviour.Defensive)
+				 m_eBehaviour == Behaviour.Defensive ||
+				 m_eBehaviour == Behaviour.Player && m_pTarget == null)
 			m_pTarget = pAttacker;
 
 		m_bJustTookDamage = true;
@@ -190,9 +205,8 @@ public class LivingBeing : MonoBehaviour
 
 	bool IsTargetVisible()
 	{
-		int iObstaclesLayer = Map.ObstaclesLayer | (m_bOpenedFire ? 0 : Map.AllButGroundLayer);	// Make sure no one is between target and himself before opening fire (and not after)
 		RaycastHit Hit;
-		bool bIsVisible = !Physics.Linecast(transform.position, m_pTarget.transform.position, out Hit, iObstaclesLayer, QueryTriggerInteraction.Ignore) || Hit.collider.gameObject == m_pTarget;
+		bool bIsVisible = !Physics.Linecast(transform.position, m_pTarget.transform.position, out Hit, Map.ObstaclesLayer, QueryTriggerInteraction.Ignore) || Hit.collider.gameObject == m_pTarget;
 		bool bInWeaponRange = m_pActiveWeapon != null && IsTargetInRange(m_pActiveWeapon.AttackRange);
 
 		return bInWeaponRange && bIsVisible;
@@ -208,6 +222,11 @@ public class LivingBeing : MonoBehaviour
 
 	#region Getters/Setters
 
+	public bool IsPlayer
+	{
+		get { return m_eBehaviour == Behaviour.Player; }
+	}
+
 	public bool IsDead
 	{
 		get { return !m_bAlive; }
@@ -216,6 +235,12 @@ public class LivingBeing : MonoBehaviour
 	public GameObject Target
 	{
 		get { return m_pTarget; }
+		set { m_pTarget = value; }
+	}
+
+	public static int AllButDeadsLayer
+	{
+		get { return ~s_iDeadsLayers; }
 	}
 
 	#endregion Getters/Setters

@@ -35,7 +35,7 @@ abstract public class Weapon : MonoBehaviour
 		m_pGun = m_pHandle.transform.FindChild("Gun").gameObject;
 	}
 
-	abstract public void Shoot(Transform pTarget);
+	public abstract void Shoot(Transform pTarget);
 
 	public float AttackRange
 	{

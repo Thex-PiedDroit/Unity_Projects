@@ -23,7 +23,7 @@ public class Map : MonoBehaviour
 	private Transform pCiviliansContainer;
 	private Transform pBadGuysContainer;
 
-	static protected int s_iAllButGroundLayer = ~(1 << 9);
+	static protected int s_iAllButGroundLayer = 1 << 9;
 	static protected int s_iObstaclesLayer = 1 << 8;
 	
 	#endregion
@@ -78,12 +78,12 @@ public class Map : MonoBehaviour
 
 	#region Getters/Setters
 
-	static public int AllButGroundLayer
+	static public int GroundLayer
 	{
 		get { return s_iAllButGroundLayer; }
 	}
 
-	static public int GroundLayer
+	static public int AllButGroundLayer
 	{
 		get { return ~s_iAllButGroundLayer; }
 	}

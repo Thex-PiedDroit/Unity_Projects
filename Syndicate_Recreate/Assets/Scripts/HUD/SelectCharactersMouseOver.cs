@@ -26,15 +26,21 @@ public class SelectCharactersMouseOver : MonoBehaviour
 	{
 		for (int i = 0; i < m_pSelectedPlayersGizmos.Length; i++)
 		{
-			m_pIsSelected[i] = m_pSelectedPlayersGizmos[i].activeSelf;
-			m_pSelectedPlayersGizmos[i].SetActive(true);
+			if (!CharactersControl.PlayerCharacters[i].IsDead)
+			{
+				m_pIsSelected[i] = m_pSelectedPlayersGizmos[i].activeSelf;
+				m_pSelectedPlayersGizmos[i].SetActive(true);
+			}
 		}
 	}
 
 	public void MouseClick()
 	{
 		for (int i = 0; i < m_pIsSelected.Length; i++)
-			m_pIsSelected[i] = true;
+		{
+			if (!CharactersControl.PlayerCharacters[i].IsDead)
+				m_pIsSelected[i] = true;
+		}
 	}
 
 	public void MouseExit()

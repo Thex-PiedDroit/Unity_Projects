@@ -9,7 +9,7 @@ public class HandGun : Weapon
 		{
 			RaycastHit Hit;
 
-			if (Physics.Linecast(m_pGun.transform.position, pTarget.transform.position, out Hit, Map.AllButGroundLayer, QueryTriggerInteraction.Ignore))
+			if (Physics.Linecast(m_pGun.transform.position, pTarget.transform.position, out Hit, (Map.AllButGroundLayer & LivingBeing.AllButDeadsLayer), QueryTriggerInteraction.Ignore))
 			{
 				Debug.DrawLine(m_pGun.transform.position, Hit.point, Color.red);
 

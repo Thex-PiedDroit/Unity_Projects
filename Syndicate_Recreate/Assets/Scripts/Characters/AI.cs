@@ -42,7 +42,7 @@ public class AI : LivingBeing
 		Gizmos.DrawWireSphere(transform.position, m_fWanderAreaRadius);
 	}
 
-	void Start()
+	protected override void Start()
 	{
 		m_tSpawnPoint = transform.position;
 		s_pGround = GameObject.FindGameObjectWithTag("Ground").transform;
@@ -50,10 +50,10 @@ public class AI : LivingBeing
 		if (s_pPlayerCharacters == null)
 			s_pPlayerCharacters = GameObject.FindGameObjectsWithTag("PlayerCharacter");
 
-		base.BehaviourStart();
+		base.Start();
 	}
 	
-	void Update()
+	protected override void Update()
 	{
 		if (m_bAlive)
 		{
@@ -84,19 +84,18 @@ public class AI : LivingBeing
 				m_fIdleStartTime = 0.0f;
 			}
 
-			base.BehaviourUpdate();
+			base.Update();
 		}
 
-		else if (m_fTimeOfDeath == 0.0f)
-		{
-			transform.forward = Vector3.down;
-			m_tNavMeshAgent.destination = transform.position;
-			m_pTarget = null;
-			m_fTimeOfDeath = Time.fixedTime;
-		}
-
-		else if (Time.fixedTime - m_fTimeOfDeath >= m_fBodyDespawnTime)
+		if (m_fTimeOfDeath != 0.0f && Time.fixedTime - m_fTimeOfDeath >= m_fBodyDespawnTime)
 			Destroy(transform.parent.gameObject);
+	}
+
+	protected override void OnDeath()
+	{
+		base.OnDeath();
+
+		m_fTimeOfDeath = Time.fixedTime;
 	}
 
 

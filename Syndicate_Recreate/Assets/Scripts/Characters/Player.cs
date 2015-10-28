@@ -16,74 +16,38 @@ public class Player : LivingBeing
 	
 	#region Variables (private)
 
-	private bool m_bSelected = false;
+	//private bool m_bSelected = false;
 
 	private float m_fDefaultHealthBarScaleY = 1.0f;
 	
 	#endregion
 
 
-	void Start()
+	protected override void Start()
 	{
-		base.BehaviourStart();
+		base.Start();
 
 		m_fDefaultHealthBarScaleY = tHealthBarGizmo.localScale.y;
 	}
 	
-	void Update ()
+	protected override void Update ()
 	{
 		if (m_bAlive)
 		{
 			if (m_tNavMeshAgent.hasPath)
 				Debug.DrawLine(transform.position, m_tNavMeshAgent.destination, Color.magenta);
 
-			if (m_bSelected)
-			{
-				if (Input.GetButton("Submit"))
-				{
-					if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
-					{
-						Vector3 tMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-						RaycastHit Hit;
-
-						if (Physics.Raycast(tMousePos, Camera.main.transform.forward, out Hit, float.MaxValue, Map.AllButObstaclesLayer, QueryTriggerInteraction.Ignore))
-						{
-							if (Hit.collider.tag != "UI")
-							{
-								if (Hit.collider.gameObject.GetComponent<LivingBeing>() != null)
-								{
-									m_pTarget = Hit.collider.gameObject;
-									m_tNavMeshAgent.destination = m_pTarget.transform.position;
-								}
-
-								else
-								{
-									m_pTarget = null;
-									m_tNavMeshAgent.destination = Hit.point;
-								}
-							}
-						}
-					}
-				}
-
-				if (Input.GetButton("Cancel"))
-				{
-					SelectUnit(false);
-				}
-			}
-
-			base.BehaviourUpdate();
+			base.Update();
 		}
 
 		else
 		{
 			if (transform.forward != Vector3.down)
 			{
-				MissionManager.CharacterDead();
+				
 				transform.forward = Vector3.down;
 				m_tNavMeshAgent.destination = transform.position;
-				m_tNavMeshAgent.Stop();
+				
 			}
 		}
 
@@ -91,11 +55,17 @@ public class Player : LivingBeing
 			UpdateHealthBar();
 	}
 
-
-	public void SelectUnit(bool bSelected)
+	protected override void OnDeath()
 	{
-		m_bSelected = bSelected;
-		tSelectedGizmo.SetActive(bSelected);
+		base.OnDeath();
+		transform.parent.parent.gameObject.GetComponent<CharactersControl>().DeselectCharacter(this);
+		MissionManager.CharacterDead();
+	}
+
+
+	public void ActivateSelectedGizmo(bool bActivated)
+	{
+		tSelectedGizmo.SetActive(bActivated);
 	}
 
 	void UpdateHealthBar()
@@ -108,6 +78,12 @@ public class Player : LivingBeing
 		tHealthBarGizmo.localScale = tScale;
 
 		m_bJustTookDamage = false;
+	}
+
+
+	public Vector3 Destination
+	{
+		set { m_tNavMeshAgent.SetDestination(value); }
 	}
 
 
