@@ -96,23 +96,26 @@ public class CharactersControl : MonoBehaviour
 
 		/* Find direction from centroid of selected characters */
 
-		Vector3 tCenteredDirection = Vector3.zero;
+		Vector3 tCentroid = Vector3.zero;
+		int i = 0;
 
-		for (int i = 0; i < s_pCharacters.Length; i++)
+		for (i = 0; i < s_pCharacters.Length; i++)
 		{
 			if ((m_iSelectedCharacters & (1 << i)) != 0)
 			{
-				tCenteredDirection += (tPoint - s_pCharacters[i].transform.position);
+				tCentroid += s_pCharacters[i].transform.position;
 			}
 		}
 
-		tCenteredDirection.y = 0.0f;
-		tCenteredDirection = (-tCenteredDirection).normalized;
+		tCentroid.y = 0.0f;
+		tCentroid /= i;
+
+		Vector3 tDirection = (tPoint - tCentroid).normalized;
 
 
 		/* Find first point to the left of tPoint which characters will position themselves from */
 
-		Vector3 tDirectionLeft = new Vector3(tCenteredDirection.z, 0.0f, tCenteredDirection.x);
+		Vector3 tDirectionLeft = new Vector3(-tDirection.z, 0.0f, tDirection.x);
 
 		float fFirstToLastDist = m_fDistanceBetweenCharacters * (m_iSelectedCharactersCount - 1);
 
@@ -122,7 +125,7 @@ public class CharactersControl : MonoBehaviour
 		/* Set character's destination from left to right of tPoint */
 
 		int iCharactersSentCount = 0;
-		for (int i = 0; i < s_pCharacters.Length; i++)
+		for (i = 0; i < s_pCharacters.Length; i++)
 		{
 			if ((m_iSelectedCharacters & (1 << i)) != 0)
 			{

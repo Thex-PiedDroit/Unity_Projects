@@ -27,15 +27,18 @@ public class ShaderManager : MonoBehaviour
 	
 	void LateUpdate()
 	{
-		Vector3 tCapsulePoint1 = transform.position - (transform.up * 0.5f);
-		Vector3 tCapsulePoint2 = transform.position + (transform.up * 0.5f);
+		if (m_tMeshRenderer.isVisible)
+		{
+			Vector3 tCapsulePoint1 = transform.position - (transform.up * 0.5f);
+			Vector3 tCapsulePoint2 = transform.position + (transform.up * 0.5f);
 
-		bool bObstacleInSight = Physics.CapsuleCast(tCapsulePoint1, tCapsulePoint2, 0.5f, -Camera.main.transform.forward, Camera.main.farClipPlane, Map.ObstaclesLayer, QueryTriggerInteraction.Ignore);
+			bool bObstacleInSight = Physics.CapsuleCast(tCapsulePoint1, tCapsulePoint2, 0.5f, -Camera.main.transform.forward, Camera.main.farClipPlane, Map.ObstaclesLayer, QueryTriggerInteraction.Ignore);
 
-		if (bObstacleInSight && (m_tMeshRenderer.material != m_pMaterialTransp))
-			m_tMeshRenderer.material = m_pMaterialTransp;
+			if (bObstacleInSight && (m_tMeshRenderer.material != m_pMaterialTransp))
+				m_tMeshRenderer.material = m_pMaterialTransp;
 
-		else if (m_tMeshRenderer.material != m_pMaterialReg)
-			m_tMeshRenderer.material = m_pMaterialReg;
+			else if (m_tMeshRenderer.material != m_pMaterialReg)
+				m_tMeshRenderer.material = m_pMaterialReg;
+		}
 	}
 }

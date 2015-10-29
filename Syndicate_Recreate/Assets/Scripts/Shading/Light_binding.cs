@@ -18,14 +18,13 @@ public class Light_binding : MonoBehaviour
 	#endregion
 
 
-	// Use this for initialization
 	void Start ()
 	{
 		UpdateLight();
 	}
 	
 #if UNITY_EDITOR
-	// Update is called once per frame
+
 	void Update ()
 	{
 		UpdateLight();

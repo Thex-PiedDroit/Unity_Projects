@@ -32,6 +32,8 @@ public class AI : LivingBeing
 	private float m_fIdleStartTime = 0.0f;
 	private float m_fTimeOfDeath = 0.0f;
 
+	private Renderer m_tRenderer;
+
 	static private GameObject[] s_pPlayerCharacters = null;
 	static private Transform s_pGround;
 	
