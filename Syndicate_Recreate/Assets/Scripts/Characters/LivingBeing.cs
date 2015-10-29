@@ -7,6 +7,8 @@ public class LivingBeing : MonoBehaviour
 
 	[SerializeField]
 	protected float m_fMaxHealth = 10.0f;
+	[SerializeField]
+	protected int m_iPersuasionStrenght = 3;
 
 	[Header("Fight")]
 	[SerializeField]
@@ -33,7 +35,7 @@ public class LivingBeing : MonoBehaviour
 
 	protected bool m_bAlive = true;
 	protected float m_fHealth = 10.0f;
-	protected bool m_bJustTookDamage = false;
+	protected int m_iPersuasion = 0;
 	protected bool m_bPursuingTarget = false;
 
 	protected NavMeshAgent m_tNavMeshAgent;
@@ -71,34 +73,52 @@ public class LivingBeing : MonoBehaviour
 		if (!m_pTarget || m_tNavMeshAgent.hasPath)
 			m_bOpenedFire = false;
 
-		if (m_pTarget && m_pTarget.GetComponent<LivingBeing>().IsDead)
-			m_pTarget = null;
 
-		else if (m_pTarget)
+		if (m_pTarget)
 		{
-			switch (m_eBehaviour)
+			if (m_pTarget.GetComponent<LivingBeing>().IsDead ||
+				(m_eBehaviour == Behaviour.Player && m_pTarget.GetComponent<LivingBeing>().m_eBehaviour == Behaviour.Ally))
 			{
-			case Behaviour.Agressive:
-			case Behaviour.Defensive:
-			case Behaviour.Ally:
-			case Behaviour.Player:
+				m_pTarget = null;
+			}
 
-				if (m_pActiveWeapon)
-					FollowTarget();
-				else
+			else
+			{
+				switch (m_eBehaviour)
+				{
+				case Behaviour.Agressive:
+				case Behaviour.Defensive:
+				case Behaviour.Player:
+
+					if (m_pActiveWeapon && m_pActiveWeapon.gameObject.activeSelf)
+						FollowTarget();
+					else
+						Flee();
+					break;
+
+				case Behaviour.Ally:
+
+					FollowPlayer();
+					break;
+
+				case Behaviour.Coward:
+				case Behaviour.Neutral:
+
+					if (m_tNavMeshAgent.hasPath)
+						Debug.DrawLine(transform.position, m_tNavMeshAgent.destination, Color.red);
+
 					Flee();
-				break;
-
-			case Behaviour.Coward:
-			case Behaviour.Neutral:
-
-				if (m_tNavMeshAgent.hasPath)
-					Debug.DrawLine(transform.position, m_tNavMeshAgent.destination, Color.red);
-
-				Flee();
-				break;
+					break;
+				}
 			}
 		}
+	}
+
+	protected virtual void OnAttacked(GameObject pAttacker)
+	{
+		if (((m_eBehaviour == Behaviour.Player && m_tNavMeshAgent.hasPath) ||
+			(m_eBehaviour == Behaviour.Player && m_pTarget != null)) == false)
+			m_pTarget = pAttacker;
 	}
 
 	protected virtual void OnDeath()
@@ -108,7 +128,7 @@ public class LivingBeing : MonoBehaviour
 		m_pTarget = null;
 		gameObject.layer = LayerMask.NameToLayer("Dead");
 		transform.forward = Vector3.down;
-		m_tNavMeshAgent.destination = transform.position;
+		m_tNavMeshAgent.SetDestination(transform.position);
 	}
 
 
@@ -119,7 +139,7 @@ public class LivingBeing : MonoBehaviour
 		if (IsTargetVisible())
 		{
 			if (m_tNavMeshAgent.hasPath)
-				m_tNavMeshAgent.destination = transform.position;
+				m_tNavMeshAgent.SetDestination(transform.position);
 
 			Attack();
 		}
@@ -130,20 +150,34 @@ public class LivingBeing : MonoBehaviour
 			{
 				if (IsTargetInRange(m_fSightRange))
 				{
-					m_tNavMeshAgent.destination = m_pTarget.transform.position;
+					m_tNavMeshAgent.SetDestination(m_pTarget.transform.position);
 					m_bPursuingTarget = false;
 				}
 
 				else if (!m_bPursuingTarget)
 				{
-					m_tNavMeshAgent.destination = transform.position;
+					m_tNavMeshAgent.SetDestination(transform.position);
 					m_pTarget = null;
 				}
 			}
 
 			else
-				m_tNavMeshAgent.destination = m_pTarget.transform.position;
+				m_tNavMeshAgent.SetDestination(m_pTarget.transform.position);
 		}
+	}
+
+	void FollowPlayer()
+	{
+		bool bTargetIsPlayer = m_pTarget.GetComponent<LivingBeing>().m_eBehaviour == Behaviour.Player;
+
+		if (m_pActiveWeapon && !bTargetIsPlayer)
+			FollowTarget();
+
+		else if (bTargetIsPlayer)
+			m_tNavMeshAgent.SetDestination(m_pTarget.transform.position - (m_pTarget.transform.forward * 3.0f));
+
+		else
+			Flee();
 	}
 
 	void Flee()
@@ -192,13 +226,7 @@ public class LivingBeing : MonoBehaviour
 		if (m_fHealth <= 0.0f)
 			OnDeath();
 
-		else if (m_eBehaviour == Behaviour.Neutral ||
-				 m_eBehaviour == Behaviour.Coward ||
-				 m_eBehaviour == Behaviour.Defensive ||
-				 m_eBehaviour == Behaviour.Player && m_pTarget == null)
-			m_pTarget = pAttacker;
-
-		m_bJustTookDamage = true;
+		OnAttacked(pAttacker);
 	}
 
 	bool IsTargetVisible()

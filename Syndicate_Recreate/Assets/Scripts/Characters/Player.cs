@@ -16,7 +16,12 @@ public class Player : LivingBeing
 	
 	#region Variables (private)
 
+	private GameObject m_pAttacker = null;
+
 	private float m_fDefaultHealthBarScaleY = 1.0f;
+
+	private float m_fKeepAttackerInCacheDuration = 2.0f;
+	private float m_fLastAttackedTime = 0.0f;
 	
 	#endregion
 
@@ -35,28 +40,27 @@ public class Player : LivingBeing
 			if (m_tNavMeshAgent.hasPath)
 				Debug.DrawLine(transform.position, m_tNavMeshAgent.destination, Color.magenta);
 
+			if (m_pAttacker && (Time.fixedTime - m_fLastAttackedTime) >= m_fKeepAttackerInCacheDuration)
+				m_pAttacker = null;
+
 			base.Update();
 		}
+	}
 
-		else
-		{
-			if (transform.forward != Vector3.down)
-			{
-				
-				transform.forward = Vector3.down;
-				m_tNavMeshAgent.destination = transform.position;
-				
-			}
-		}
+	protected override void OnAttacked(GameObject pAttacker)
+	{
+		base.OnAttacked(pAttacker);
 
-		if (m_bJustTookDamage)
-			UpdateHealthBar();
+		m_pAttacker = pAttacker;
+		m_fLastAttackedTime = Time.fixedTime;
+		UpdateHealthBar();
 	}
 
 	protected override void OnDeath()
 	{
 		base.OnDeath();
 		transform.parent.parent.gameObject.GetComponent<CharactersControl>().DeselectCharacter(this);
+		m_pAttacker = null;
 		MissionManager.CharacterDead();
 	}
 
@@ -74,8 +78,6 @@ public class Player : LivingBeing
 		Vector3 tScale = tHealthBarGizmo.localScale;
 		tScale.y = fNewScale;
 		tHealthBarGizmo.localScale = tScale;
-
-		m_bJustTookDamage = false;
 	}
 
 
@@ -117,6 +119,11 @@ public class Player : LivingBeing
 				m_pActiveWeapon.transform.parent = transform;
 			}
 		}
+	}
+
+	public GameObject Attacker
+	{
+		get { return m_pAttacker; }
 	}
 
 

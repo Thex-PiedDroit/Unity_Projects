@@ -35,6 +35,7 @@ public class AI : LivingBeing
 	private Renderer m_tRenderer;
 
 	static private GameObject[] s_pPlayerCharacters = null;
+	static private Player[] s_pPlayerCharactersScripts = null;
 	static private Transform s_pGround;
 	
 	#endregion
@@ -50,7 +51,10 @@ public class AI : LivingBeing
 		s_pGround = GameObject.FindGameObjectWithTag("Ground").transform;
 
 		if (s_pPlayerCharacters == null)
+		{
 			s_pPlayerCharacters = GameObject.FindGameObjectsWithTag("PlayerCharacter");
+			s_pPlayerCharactersScripts = GameObject.FindObjectsOfType<Player>();
+		}
 
 		base.Start();
 	}
@@ -65,12 +69,12 @@ public class AI : LivingBeing
 			case Behaviour.Defensive:
 			case Behaviour.Agressive:
 
-				m_pTarget = SearchTarget();
+				SearchTarget();
 				break;
 
 			case Behaviour.Ally:
 
-				m_pTarget = GetPlayerTarget();
+				GetPlayerTarget();
 				break;
 			}
 
@@ -143,7 +147,7 @@ public class AI : LivingBeing
 		}
 	}
 
-	GameObject SearchTarget()
+	void SearchTarget()
 	{
 		GameObject pTarget = null;
 
@@ -211,20 +215,48 @@ public class AI : LivingBeing
 			}
 		}
 
-		return pTarget;
+		m_pTarget = pTarget;
 	}
 
-	GameObject GetPlayerTarget()
+	void GetPlayerTarget()
 	{
-		// Will do if needed
+		float fNearestCharacterSqrdDist = m_fSightRange * m_fSightRange;
+		int iNearestPlayer = -1;
 
-		return null;
+		for (int i = 0; i < s_pPlayerCharacters.Length; i++)
+		{
+			if ((transform.position - s_pPlayerCharacters[i].transform.position).sqrMagnitude <= fNearestCharacterSqrdDist)
+				iNearestPlayer = i;
+		}
+
+		if (iNearestPlayer != -1)
+		{
+			GameObject pNearestPlayerTarget = s_pPlayerCharactersScripts[iNearestPlayer].Attacker;
+			if (!pNearestPlayerTarget)
+				pNearestPlayerTarget = s_pPlayerCharactersScripts[iNearestPlayer].Target;
+
+			m_pTarget = pNearestPlayerTarget ? pNearestPlayerTarget : s_pPlayerCharacters[iNearestPlayer];
+		}
+	}
+
+	public void Persuade(GameObject pAttacker)
+	{
+		m_iPersuasion++;
+
+		if (m_iPersuasion >= m_iPersuasionStrenght)
+		{
+			m_eBehaviour = Behaviour.Ally;
+			m_eWanderingBehaviour = WanderType.Area;
+		}
+
+		OnAttacked(pAttacker);
 	}
 
 
 	static public void ClearCharactersArray()
 	{
 		s_pPlayerCharacters = null;
+		s_pPlayerCharactersScripts = null;
 	}
 
 	#endregion

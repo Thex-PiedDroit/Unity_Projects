@@ -26,7 +26,6 @@ public class CharactersControl : MonoBehaviour
 	private int m_iSelectedCharactersCount = 0;
 
 	private int m_iRenderedWeaponIcons = 0;
-	private int m_iActiveWeaponID = -1;
 
 	#endregion
 
@@ -254,9 +253,6 @@ public class CharactersControl : MonoBehaviour
 			}
 		}
 
-		if (iHasTheWeaponCount != m_iSelectedCharactersCount)
-			m_iActiveWeaponID = iWeaponID;
-
 		UpdateWeaponSelected();
 	}
 
@@ -290,8 +286,8 @@ public class CharactersControl : MonoBehaviour
 		else
 			bCommonWeapon = false;
 
-		if (m_iActiveWeaponID != -1)
-			m_pRenderedWeaponIcons[m_iActiveWeaponID].GetComponent<WeaponButton>().Equipped = false;
+		for (int i = 0; i < m_iRenderedWeaponIcons; i++)
+			m_pRenderedWeaponIcons[i].GetComponent<WeaponButton>().Equipped = false;
 
 		if (bCommonWeapon)
 		{

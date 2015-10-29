@@ -33,7 +33,26 @@ abstract public class Weapon : MonoBehaviour
 		m_pGun = m_pHandle.transform.FindChild("Gun").gameObject;
 	}
 
-	public abstract void Shoot(Transform pTarget);
+	public virtual void Shoot(Transform pTarget)
+	{
+		if (Time.fixedTime - m_fLastAttackTime >= m_fFireSpeed)
+		{
+			RaycastHit Hit;
+
+			if (Physics.Linecast(m_pGun.transform.position, pTarget.transform.position, out Hit, (Map.AllButGroundLayer & LivingBeing.AllButDeadsLayer), QueryTriggerInteraction.Ignore))
+			{
+				LivingBeing tShotThing = Hit.collider.gameObject.GetComponent<LivingBeing>();
+
+				if (tShotThing)
+					OnShoot(tShotThing);
+			}
+
+			m_fLastAttackTime = Time.fixedTime;
+			m_pShootAnimation.Play();
+		}
+	}
+
+	public abstract void OnShoot(LivingBeing pShotThing);
 
 	public float AttackRange
 	{
