@@ -71,9 +71,12 @@ public class LivingBeing : MonoBehaviour
 		if (!m_pTarget || m_tNavMeshAgent.hasPath)
 			m_bOpenedFire = false;
 
-		if (m_pTarget)
+		if (m_pTarget && m_pTarget.GetComponent<LivingBeing>().IsDead)
+			m_pTarget = null;
+
+		else if (m_pTarget)
 		{
-			switch(m_eBehaviour)
+			switch (m_eBehaviour)
 			{
 			case Behaviour.Agressive:
 			case Behaviour.Defensive:
@@ -95,9 +98,6 @@ public class LivingBeing : MonoBehaviour
 				Flee();
 				break;
 			}
-
-			if (m_pTarget && m_pTarget.GetComponent<LivingBeing>().IsDead)
-				m_pTarget = null;
 		}
 	}
 
