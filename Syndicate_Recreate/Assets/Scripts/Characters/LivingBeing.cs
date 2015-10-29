@@ -174,7 +174,16 @@ public class LivingBeing : MonoBehaviour
 			FollowTarget();
 
 		else if (bTargetIsPlayer)
-			m_tNavMeshAgent.SetDestination(m_pTarget.transform.position - (m_pTarget.transform.forward * 3.0f));
+		{
+			if (IsTargetInRange(m_fSightRange))
+				m_tNavMeshAgent.SetDestination(m_pTarget.transform.position - (m_pTarget.transform.forward * 3.0f));
+			else
+			{
+				m_pTarget = null;
+				m_tNavMeshAgent.SetDestination(transform.position);
+				GetComponent<AI>().WanderCenterPoint = transform.position;
+			}
+		}
 
 		else
 			Flee();

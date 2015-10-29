@@ -26,7 +26,7 @@ public class AI : LivingBeing
 	}
 
 
-	private Vector3 m_tSpawnPoint;
+	private Vector3 m_tWanderCenterPoint;
 
 	private float m_fRandomIdleTime = 0.0f;
 	private float m_fIdleStartTime = 0.0f;
@@ -47,7 +47,7 @@ public class AI : LivingBeing
 
 	protected override void Start()
 	{
-		m_tSpawnPoint = transform.position;
+		m_tWanderCenterPoint = transform.position;
 		s_pGround = GameObject.FindGameObjectWithTag("Ground").transform;
 
 		if (s_pPlayerCharacters == null)
@@ -129,7 +129,7 @@ public class AI : LivingBeing
 						tRandomDestination.x = tRandomPoint.x;
 						tRandomDestination.z = tRandomPoint.y;
 
-						tRandomDestination += m_tSpawnPoint;
+						tRandomDestination += m_tWanderCenterPoint;
 						break;
 					}
 
@@ -259,12 +259,17 @@ public class AI : LivingBeing
 		s_pPlayerCharactersScripts = null;
 	}
 
-	#endregion
+	#endregion Methods
+
+	public Vector3 WanderCenterPoint
+	{
+		set { m_tWanderCenterPoint = value; }
+	}
 
 
 	void OnDestroy()
 	{
-		if (gameObject.tag == "Target")
+		if (gameObject.transform.parent.tag == "Target")
 			MissionManager.TargetDead();
 	}
 }

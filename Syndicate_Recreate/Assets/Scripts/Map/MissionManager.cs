@@ -149,7 +149,7 @@ public class MissionManager : MonoBehaviour
 
 	void OnCollisionEnter(Collision tCollider)
 	{
-		if (tCollider.gameObject.tag == "Target")
+		if (tCollider.gameObject.transform.parent.tag == "Target")
 		{
 			switch (m_eMissionType)
 			{
@@ -162,6 +162,9 @@ public class MissionManager : MonoBehaviour
 
 				m_iRemainingTargets--;
 				Assert.IsTrue(m_iRemainingTargets >= 0);
+
+				tCollider.gameObject.transform.parent.tag = "Untagged";
+				Destroy(tCollider.gameObject.transform.parent.gameObject);
 
 				if (m_iRemainingTargets == 0)
 					ToggleMissionSucceeded();

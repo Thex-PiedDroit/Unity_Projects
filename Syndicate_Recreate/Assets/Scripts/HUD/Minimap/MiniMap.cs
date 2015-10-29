@@ -103,9 +103,6 @@ public class MiniMap : MonoBehaviour
 
 				pBlips.Add(Instantiate<GameObject>(tRedBlip));
 				pBlips[iBlipsCount].name = tRedBlip.name;
-
-				if (pLivingBeings[i].gameObject.tag == "Target")
-					pBlips[iBlipsCount].GetComponent<Blip>().ForwardUpdateFrequency = Blip.ForwardUpdate.IfOutBorders;
 				break;
 
 			case "Civilians":
@@ -114,6 +111,9 @@ public class MiniMap : MonoBehaviour
 				pBlips[iBlipsCount].name = tOrangeBlip.name;
 				break;
 			}
+
+			if (pLivingBeings[i].gameObject.tag == "Target")
+				pBlips[iBlipsCount].GetComponent<Blip>().ForwardUpdateFrequency = Blip.ForwardUpdate.IfOutBorders;
 
 			pBlips[iBlipsCount].transform.SetParent(pBlipsParent, false);
 			pBlips[iBlipsCount].transform.localPosition = Vector2.zero;

@@ -57,43 +57,46 @@ public class Blip : MonoBehaviour
 	{
 		if (s_pMinimap)
 		{
-			Vector2 tNewLocalPos = s_pMinimap.GetBlipLocalPosition(m_pTarget.position);
+			if (!m_pTarget || (m_bTargetIsLivingBeing && m_pTarget.GetComponentInChildren<LivingBeing>().IsDead))
+				Destroy(gameObject);
 
-			bool bOutOfBorders = false;
-
-			if (m_eForwardUpdateFrequency != ForwardUpdate.Once)
+			else
 			{
-				Vector2 tScaledSize = m_tRectTransform.rect.size;
-				tScaledSize.Scale(m_tRectTransform.localScale);
-				Vector2 tClampedPos = s_pMinimap.KeepBlipInBounds(tNewLocalPos, tScaledSize);
+				Vector2 tNewLocalPos = s_pMinimap.GetBlipLocalPosition(m_pTarget.position);
 
-				if (tClampedPos != tNewLocalPos)
+				bool bOutOfBorders = false;
+
+				if (m_eForwardUpdateFrequency != ForwardUpdate.Once)
 				{
-					m_tRawImage.texture = m_tOutOfBordersBlip;
+					Vector2 tScaledSize = m_tRectTransform.rect.size;
+					tScaledSize.Scale(m_tRectTransform.localScale);
+					Vector2 tClampedPos = s_pMinimap.KeepBlipInBounds(tNewLocalPos, tScaledSize);
 
-					Vector2 tTargetDirection = (tNewLocalPos - tClampedPos).normalized;
-					m_tRectTransform.up = tTargetDirection;
+					if (tClampedPos != tNewLocalPos)
+					{
+						m_tRawImage.texture = m_tOutOfBordersBlip;
 
-					bOutOfBorders = true;
+						Vector2 tTargetDirection = (tNewLocalPos - tClampedPos).normalized;
+						m_tRectTransform.up = tTargetDirection;
+
+						bOutOfBorders = true;
+					}
+
+					else if (m_eForwardUpdateFrequency == ForwardUpdate.Always)
+						UpdateForward();
+
+					else
+						m_tRawImage.texture = m_tDefaultBlip;
+
+					tNewLocalPos = tClampedPos;
 				}
 
-				else if (m_eForwardUpdateFrequency == ForwardUpdate.Always)
-					UpdateForward();
+				if (!m_bLockScreenRotation && !bOutOfBorders)
+					m_tRectTransform.localEulerAngles = s_pMinimap.TransformRotation(m_pTarget.eulerAngles);
 
-				else
-					m_tRawImage.texture = m_tDefaultBlip;
-
-				tNewLocalPos = tClampedPos;
+				m_tRectTransform.localPosition = tNewLocalPos;
 			}
-
-			if (!m_bLockScreenRotation && !bOutOfBorders)
-				m_tRectTransform.localEulerAngles = s_pMinimap.TransformRotation(m_pTarget.eulerAngles);
-
-			m_tRectTransform.localPosition = tNewLocalPos;
 		}
-
-		if (m_bTargetIsLivingBeing && m_pTarget.GetComponentInChildren<LivingBeing>().IsDead)
-			Destroy(gameObject);
 	}
 
 
