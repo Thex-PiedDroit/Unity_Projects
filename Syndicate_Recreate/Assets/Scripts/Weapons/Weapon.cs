@@ -11,8 +11,6 @@ abstract public class Weapon : MonoBehaviour
 	protected float m_fFireSpeed = 1.0f;
 	[SerializeField]
 	protected float m_fDefaultDamages = 2.0f;
-	//[SerializeField]
-	//private Texture m_pUIInventoryTexture;
 	
 	#endregion
 	
@@ -40,5 +38,10 @@ abstract public class Weapon : MonoBehaviour
 	public float AttackRange
 	{
 		get { return m_fAttackRange; }
+	}
+
+	public GameObject Icon
+	{
+		get { return WeaponsIcons.GetIcon(gameObject.name); }
 	}
 }

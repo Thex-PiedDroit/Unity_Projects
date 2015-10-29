@@ -225,7 +225,21 @@ public class LivingBeing : MonoBehaviour
 	public GameObject Target
 	{
 		get { return m_pTarget; }
-		set { m_pTarget = value; }
+		set
+		{
+			if (m_eBehaviour == Behaviour.Player)
+			{
+				if (m_pActiveWeapon)
+				{
+					m_pActiveWeapon.gameObject.SetActive(true);
+				}
+
+				else
+					return;
+			}
+
+			m_pTarget = value;
+		}
 	}
 
 	public static int AllButDeadsLayer

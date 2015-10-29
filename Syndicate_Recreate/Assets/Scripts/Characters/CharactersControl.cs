@@ -7,21 +7,37 @@ public class CharactersControl : MonoBehaviour
 
 	[SerializeField]
 	private float m_fDistanceBetweenCharacters = 1.5f;
+
+	[SerializeField]
+	private Weapon[] m_pWeaponsInventory;
+	[SerializeField]
+	private Vector3 m_pInventoryFrameOffset = Vector3.zero;
 	
 	#endregion
 	
 	#region Variables (private)
 
+	private Transform pHUDInventory;
+
 	static private Player[] s_pCharacters = null;
 	private byte m_iSelectedCharacters = 0;				// Bitfield selection
 	private int m_iSelectedCharactersCount = 0;
+
+	private int m_iRenderedWeaponIcons = 0;
 
 	#endregion
 
 
 	void Start()
 	{
+		pHUDInventory = GameObject.Find("Inventory").transform;
+
 		s_pCharacters = FindObjectsOfType<Player>();
+
+		for (int i = 0; i < m_pWeaponsInventory.Length; i++)
+		{
+			RenderWeaponIcon(m_pWeaponsInventory[i].Icon, m_pWeaponsInventory[i].name);
+		}
 	}
 	
 	void Update()
@@ -59,6 +75,9 @@ public class CharactersControl : MonoBehaviour
 		if (Input.GetButton("Cancel"))
 			DeselectAll();
 	}
+
+
+	#region Methods
 
 	void SendTarget(GameObject pTarget)
 	{
@@ -170,6 +189,43 @@ public class CharactersControl : MonoBehaviour
 			s_pCharacters[i].ActivateSelectedGizmo(false);
 		}
 	}
+
+	void RenderWeaponIcon(GameObject pIcon, string pWeaponName)
+	{
+		GameObject tNewIcon = Instantiate(pIcon, pHUDInventory.position, pHUDInventory.rotation) as GameObject;
+		tNewIcon.name = pWeaponName;
+		tNewIcon.transform.SetParent(pHUDInventory, false);
+
+		int x = m_iRenderedWeaponIcons % 4;
+		int y = -(m_iRenderedWeaponIcons / 4);
+		RectTransform tIconRect = tNewIcon.GetComponent<RectTransform>();
+
+		Vector3 tLocalPos = m_pInventoryFrameOffset + new Vector3(tIconRect.rect.size.x * x, tIconRect.rect.size.y * y, 0.0f);
+		tNewIcon.transform.localPosition = tLocalPos;
+
+		m_iRenderedWeaponIcons++;
+	}
+
+	public void SendEquip(string pWeaponName)
+	{
+		for (int i = 0; i < m_pWeaponsInventory.Length; i++)
+		{
+			if (m_pWeaponsInventory[i].name == pWeaponName)
+			{
+				for (int j = 0; j < s_pCharacters.Length; j++)
+				{
+					if ((m_iSelectedCharacters & (1 << j)) != 0)
+					{
+						s_pCharacters[j].ActiveWeapon = m_pWeaponsInventory[i];
+					}
+				}
+
+				break;
+			}
+		}
+	}
+
+	#endregion Methods
 
 
 	public static LivingBeing[] PlayerCharacters

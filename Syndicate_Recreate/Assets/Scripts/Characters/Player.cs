@@ -16,8 +16,6 @@ public class Player : LivingBeing
 	
 	#region Variables (private)
 
-	//private bool m_bSelected = false;
-
 	private float m_fDefaultHealthBarScaleY = 1.0f;
 	
 	#endregion
@@ -84,6 +82,31 @@ public class Player : LivingBeing
 	public Vector3 Destination
 	{
 		set { m_tNavMeshAgent.SetDestination(value); }
+	}
+
+	public Weapon ActiveWeapon
+	{
+		set
+		{
+			bool bSameWeapon = false;
+
+			if (m_pActiveWeapon != null && m_pActiveWeapon.name == value.name)
+			{
+				m_pActiveWeapon.gameObject.SetActive(!m_pActiveWeapon.gameObject.activeSelf);
+
+				bSameWeapon = true;
+			}
+			
+			else if (m_pActiveWeapon)
+				Destroy(m_pActiveWeapon.gameObject);
+
+			if (!bSameWeapon)
+			{
+				m_pActiveWeapon = Instantiate(value, transform.position, transform.rotation) as Weapon;
+				m_pActiveWeapon.name = value.name;
+				m_pActiveWeapon.transform.parent = transform;
+			}
+		}
 	}
 
 

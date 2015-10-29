@@ -12,6 +12,7 @@ public class SelectCharactersMouseOver : MonoBehaviour
 	
 	#region Variables (private)
 
+	private CharactersControl pCharactersControl;
 	private bool[] m_pIsSelected = null;
 	
 	#endregion
@@ -19,6 +20,7 @@ public class SelectCharactersMouseOver : MonoBehaviour
 	void Awake()
 	{
 		m_pIsSelected = new bool[m_pSelectedPlayersGizmos.Length];
+		pCharactersControl = GameObject.FindObjectOfType<CharactersControl>();
 	}
 
 
@@ -39,7 +41,10 @@ public class SelectCharactersMouseOver : MonoBehaviour
 		for (int i = 0; i < m_pIsSelected.Length; i++)
 		{
 			if (!CharactersControl.PlayerCharacters[i].IsDead)
+			{
+				pCharactersControl.SelectCharacter(i);
 				m_pIsSelected[i] = true;
+			}
 		}
 	}
 
