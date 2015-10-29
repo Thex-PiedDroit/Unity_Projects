@@ -215,11 +215,28 @@ public class CharactersControl : MonoBehaviour
 		{
 			if (m_pWeaponsInventory[i].name == pWeaponName)
 			{
+				byte iHasTheWeapon = 0;
+				int iHasTheWeaponCount = 0;
+
+				for (int j = 0; j < s_pCharacters.Length; j++)
+				{
+					if ((m_iSelectedCharacters & (1 << j)) != 0 &&
+						s_pCharacters[j].ActiveWeaponName == pWeaponName)
+					{
+						iHasTheWeapon |= (byte)(1 << j);
+						iHasTheWeaponCount++;
+						//s_pCharacters[j].ActiveWeapon = m_pWeaponsInventory[i];
+					}
+				}
+
+				bool bSendToAll = iHasTheWeapon == 0 || (iHasTheWeaponCount == m_iSelectedCharactersCount);
+
 				for (int j = 0; j < s_pCharacters.Length; j++)
 				{
 					if ((m_iSelectedCharacters & (1 << j)) != 0)
 					{
-						s_pCharacters[j].ActiveWeapon = m_pWeaponsInventory[i];
+						if (bSendToAll || ((iHasTheWeapon & (1 << j)) == 0))
+							s_pCharacters[j].ActiveWeapon = m_pWeaponsInventory[i];
 					}
 				}
 

@@ -104,7 +104,6 @@ public class MiniMap : MonoBehaviour
 				pBlips.Add(Instantiate<GameObject>(tRedBlip));
 				pBlips[iBlipsCount].name = tRedBlip.name;
 
-				//print(pLivingBeings[i].gameObject.tag);
 				if (pLivingBeings[i].gameObject.tag == "Target")
 					pBlips[iBlipsCount].GetComponent<Blip>().ForwardUpdateFrequency = Blip.ForwardUpdate.IfOutBorders;
 				break;

@@ -48,6 +48,7 @@ public class LivingBeing : MonoBehaviour
 	#region Variables (private)
 
 	private float m_fDefaultSpeed;
+	private bool m_bOpenedFire = false;
 	
 	#endregion
 
@@ -67,6 +68,9 @@ public class LivingBeing : MonoBehaviour
 
 	protected virtual void Update()
 	{
+		if (!m_pTarget || m_tNavMeshAgent.hasPath)
+			m_bOpenedFire = false;
+
 		if (m_pTarget)
 		{
 			switch(m_eBehaviour)
@@ -76,7 +80,10 @@ public class LivingBeing : MonoBehaviour
 			case Behaviour.Ally:
 			case Behaviour.Player:
 
-				FollowTarget();
+				if (m_pActiveWeapon)
+					FollowTarget();
+				else
+					Flee();
 				break;
 
 			case Behaviour.Coward:
@@ -169,8 +176,9 @@ public class LivingBeing : MonoBehaviour
 
 	void Attack()
 	{
-		transform.parent.LookAt(m_pTarget.transform);
+		m_bOpenedFire = true;
 
+		transform.parent.LookAt(m_pTarget.transform.parent);
 		m_pActiveWeapon.Shoot(m_pTarget.transform);
 	}
 
@@ -196,7 +204,19 @@ public class LivingBeing : MonoBehaviour
 	bool IsTargetVisible()
 	{
 		RaycastHit Hit;
-		bool bIsVisible = !Physics.Linecast(transform.position, m_pTarget.transform.position, out Hit, Map.ObstaclesLayer, QueryTriggerInteraction.Ignore) || Hit.collider.gameObject == m_pTarget;
+		
+
+		bool bIsVisible = false;
+
+		if (!m_bOpenedFire)
+		{
+			int iObstaclesLayer = Map.ObstaclesLayer | s_iLivingBeingsLayer;	// Check if no living being inbetween before opening fire (not after)
+			bIsVisible = Physics.Linecast(transform.position, m_pTarget.transform.position, out Hit, iObstaclesLayer, QueryTriggerInteraction.Ignore) && Hit.collider.gameObject == m_pTarget;
+		}
+
+		else
+			bIsVisible = Physics.Linecast(transform.position, m_pTarget.transform.position, out Hit, s_iLivingBeingsLayer, QueryTriggerInteraction.Ignore);
+
 		bool bInWeaponRange = m_pActiveWeapon != null && IsTargetInRange(m_pActiveWeapon.AttackRange);
 
 		return bInWeaponRange && bIsVisible;
@@ -227,18 +247,11 @@ public class LivingBeing : MonoBehaviour
 		get { return m_pTarget; }
 		set
 		{
-			if (m_eBehaviour == Behaviour.Player)
+			if (m_pActiveWeapon != null &&
+				m_pActiveWeapon.gameObject.activeSelf)
 			{
-				if (m_pActiveWeapon)
-				{
-					m_pActiveWeapon.gameObject.SetActive(true);
-				}
-
-				else
-					return;
+				m_pTarget = value;
 			}
-
-			m_pTarget = value;
 		}
 	}
 
