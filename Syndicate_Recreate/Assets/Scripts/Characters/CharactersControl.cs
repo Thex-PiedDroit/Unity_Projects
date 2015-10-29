@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Assertions;
 
 public class CharactersControl : MonoBehaviour
 {
@@ -18,12 +19,14 @@ public class CharactersControl : MonoBehaviour
 	#region Variables (private)
 
 	private Transform pHUDInventory;
+	private GameObject[] m_pRenderedWeaponIcons = new GameObject[8];
 
 	static private Player[] s_pCharacters = null;
 	private byte m_iSelectedCharacters = 0;				// Bitfield selection
 	private int m_iSelectedCharactersCount = 0;
 
 	private int m_iRenderedWeaponIcons = 0;
+	private int m_iActiveWeaponID = -1;
 
 	#endregion
 
@@ -74,6 +77,11 @@ public class CharactersControl : MonoBehaviour
 
 		if (Input.GetButton("Cancel"))
 			DeselectAll();
+	}
+
+	void OnSelectionChange()
+	{
+		UpdateWeaponSelected();
 	}
 
 
@@ -149,6 +157,8 @@ public class CharactersControl : MonoBehaviour
 
 			s_pCharacters[iCharacterNumber].ActivateSelectedGizmo(true);
 		}
+
+		OnSelectionChange();
 	}
 
 	public void SelectCharacter(Player pCharacter)
@@ -171,6 +181,8 @@ public class CharactersControl : MonoBehaviour
 
 			s_pCharacters[iCharacterNumber].ActivateSelectedGizmo(false);
 		}
+
+		OnSelectionChange();
 	}
 
 	public void DeselectCharacter(Player pCharacter)
@@ -191,6 +203,8 @@ public class CharactersControl : MonoBehaviour
 		{
 			s_pCharacters[i].ActivateSelectedGizmo(false);
 		}
+
+		OnSelectionChange();
 	}
 
 	void RenderWeaponIcon(GameObject pIcon, string pWeaponName)
@@ -206,43 +220,99 @@ public class CharactersControl : MonoBehaviour
 		Vector3 tLocalPos = m_pInventoryFrameOffset + new Vector3(tIconRect.rect.size.x * x, tIconRect.rect.size.y * y, 0.0f);
 		tNewIcon.transform.localPosition = tLocalPos;
 
+		m_pRenderedWeaponIcons[m_iRenderedWeaponIcons] = tNewIcon;
 		m_iRenderedWeaponIcons++;
 	}
 
 	public void SendEquip(string pWeaponName)
 	{
+		int iWeaponID = FindWeaponByName(pWeaponName);
+
+		Assert.IsTrue(iWeaponID != -1, "No weapon to equip! Must be a button error");
+
+		byte iHasTheWeapon = 0;
+		int iHasTheWeaponCount = 0;
+
+		for (int j = 0; j < s_pCharacters.Length; j++)
+		{
+			if ((m_iSelectedCharacters & (1 << j)) != 0 &&
+				s_pCharacters[j].ActiveWeaponName == pWeaponName)
+			{
+				iHasTheWeapon |= (byte)(1 << j);
+				iHasTheWeaponCount++;
+			}
+		}
+
+		bool bSendToAll = iHasTheWeapon == 0 || (iHasTheWeaponCount == m_iSelectedCharactersCount);
+
+		for (int j = 0; j < s_pCharacters.Length; j++)
+		{
+			if ((m_iSelectedCharacters & (1 << j)) != 0)
+			{
+				if (bSendToAll || ((iHasTheWeapon & (1 << j)) == 0))
+					s_pCharacters[j].ActiveWeapon = m_pWeaponsInventory[iWeaponID];
+			}
+		}
+
+		if (iHasTheWeaponCount != m_iSelectedCharactersCount)
+			m_iActiveWeaponID = iWeaponID;
+
+		UpdateWeaponSelected();
+	}
+
+	void UpdateWeaponSelected()
+	{
+		string pActiveWeapon = null;
+		bool bCommonWeapon = true;
+
+		if (m_iSelectedCharacters != 0)
+		{
+			for (int i = 0; i < s_pCharacters.Length; i++)
+			{
+				if ((m_iSelectedCharacters & (1 << i)) != 0)
+				{
+					string pCharActiveWeapon = s_pCharacters[i].ActiveWeaponName;
+
+					if (pActiveWeapon == null && pCharActiveWeapon != "No active weapon")
+					{
+						pActiveWeapon = pCharActiveWeapon;
+					}
+
+					else if (pCharActiveWeapon != pActiveWeapon)
+					{
+						bCommonWeapon = false;
+						break;
+					}
+				}
+			}
+		}
+
+		else
+			bCommonWeapon = false;
+
+		if (m_iActiveWeaponID != -1)
+			m_pRenderedWeaponIcons[m_iActiveWeaponID].GetComponent<WeaponButton>().Equipped = false;
+
+		if (bCommonWeapon)
+		{
+			int iWeaponID = FindWeaponByName(pActiveWeapon);
+			m_pRenderedWeaponIcons[iWeaponID].GetComponent<WeaponButton>().Equipped = true;
+		}
+	}
+
+	int FindWeaponByName(string pWeaponName)
+	{
+		int iWeaponID = -1;
+
 		for (int i = 0; i < m_pWeaponsInventory.Length; i++)
 		{
 			if (m_pWeaponsInventory[i].name == pWeaponName)
 			{
-				byte iHasTheWeapon = 0;
-				int iHasTheWeaponCount = 0;
-
-				for (int j = 0; j < s_pCharacters.Length; j++)
-				{
-					if ((m_iSelectedCharacters & (1 << j)) != 0 &&
-						s_pCharacters[j].ActiveWeaponName == pWeaponName)
-					{
-						iHasTheWeapon |= (byte)(1 << j);
-						iHasTheWeaponCount++;
-						//s_pCharacters[j].ActiveWeapon = m_pWeaponsInventory[i];
-					}
-				}
-
-				bool bSendToAll = iHasTheWeapon == 0 || (iHasTheWeaponCount == m_iSelectedCharactersCount);
-
-				for (int j = 0; j < s_pCharacters.Length; j++)
-				{
-					if ((m_iSelectedCharacters & (1 << j)) != 0)
-					{
-						if (bSendToAll || ((iHasTheWeapon & (1 << j)) == 0))
-							s_pCharacters[j].ActiveWeapon = m_pWeaponsInventory[i];
-					}
-				}
-
-				break;
+				iWeaponID = i;
 			}
 		}
+
+		return iWeaponID;
 	}
 
 	#endregion Methods
