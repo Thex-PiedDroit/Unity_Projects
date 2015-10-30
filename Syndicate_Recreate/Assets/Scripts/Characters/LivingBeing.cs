@@ -244,8 +244,11 @@ public class LivingBeing : MonoBehaviour
 	{
 		m_bOpenedFire = true;
 
-		transform.parent.LookAt(m_pTarget.transform.parent);
-		m_pActiveWeapon.Shoot(m_pTarget.transform);
+		if (m_pTarget && m_pActiveWeapon && m_pActiveWeapon.gameObject.activeSelf)
+		{
+			transform.parent.LookAt(m_pTarget.transform.parent);
+			m_pActiveWeapon.Shoot(m_pTarget.transform);
+		}
 	}
 
 	public void ReceiveDamage(float fDamages, GameObject pAttacker)
@@ -277,18 +280,18 @@ public class LivingBeing : MonoBehaviour
 	bool IsTargetVisible()
 	{
 		RaycastHit Hit;
-		
+		Vector3 tGunPos = m_pActiveWeapon.transform.FindChild("Handle").FindChild("Gun").position;
 
 		bool bIsVisible = false;
 
 		if (!m_bOpenedFire)
 		{
 			int iObstaclesLayer = Map.ObstaclesLayer | s_iLivingBeingsLayer;	// Check if no living being inbetween before opening fire (not after)
-			bIsVisible = Physics.Linecast(transform.position, m_pTarget.transform.position, out Hit, iObstaclesLayer, QueryTriggerInteraction.Ignore) && Hit.collider.gameObject == m_pTarget;
+			bIsVisible = Physics.Linecast(tGunPos, m_pTarget.transform.position, out Hit, iObstaclesLayer, QueryTriggerInteraction.Ignore) && Hit.collider.gameObject == m_pTarget;
 		}
 
 		else
-			bIsVisible = Physics.Linecast(transform.position, m_pTarget.transform.position, out Hit, s_iLivingBeingsLayer, QueryTriggerInteraction.Ignore);
+			bIsVisible = !Physics.Linecast(tGunPos, m_pTarget.transform.position, out Hit, Map.ObstaclesLayer, QueryTriggerInteraction.Ignore);
 
 		bool bInWeaponRange = m_pActiveWeapon != null && IsTargetInRange(m_pActiveWeapon.AttackRange);
 

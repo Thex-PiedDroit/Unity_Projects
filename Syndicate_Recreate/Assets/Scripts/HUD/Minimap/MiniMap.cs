@@ -48,6 +48,8 @@ public class MiniMap : MonoBehaviour
 		m_tRotationY = new Vector2(-CameraControl.HorizontalForward.x, CameraControl.HorizontalForward.z);
 
 
+		/* Create buildings blips */
+
 		Transform pBlipsParent = transform.FindChild("RenderedBack");
 
 		GameObject[] pBuildings = GameObject.FindGameObjectsWithTag("Building");
@@ -67,6 +69,8 @@ public class MiniMap : MonoBehaviour
 			iBlipsCount++;
 		}
 
+		/* Create walls blips */
+
 		GameObject[] pWalls = GameObject.FindGameObjectsWithTag("Wall");
 
 		foreach (GameObject tWall in pWalls)
@@ -83,6 +87,8 @@ public class MiniMap : MonoBehaviour
 		}
 
 		pBlipsParent = transform.FindChild("RenderedFront");
+
+		/* Create living beings blips */
 
 		LivingBeing[] pLivingBeingsComponents = GameObject.FindObjectsOfType<LivingBeing>();
 		pLivingBeings = new GameObject[pLivingBeingsComponents.Length];

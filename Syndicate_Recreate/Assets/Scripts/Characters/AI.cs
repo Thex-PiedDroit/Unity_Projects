@@ -239,12 +239,15 @@ public class AI : LivingBeing
 
 		for (int i = 0; i < s_pPlayerCharacters.Length; i++)
 		{
-			float fSqrDist = (transform.position - s_pPlayerCharacters[i].transform.position).sqrMagnitude;
-
-			if (fSqrDist <= fNearestCharacterSqrdDist)
+			if (!s_pPlayerCharactersScripts[i].IsDead)
 			{
-				iNearestPlayer = i;
-				fNearestCharacterSqrdDist = fSqrDist;
+				float fSqrDist = (transform.position - s_pPlayerCharacters[i].transform.position).sqrMagnitude;
+
+				if (fSqrDist <= fNearestCharacterSqrdDist)
+				{
+					iNearestPlayer = i;
+					fNearestCharacterSqrdDist = fSqrDist;
+				}
 			}
 		}
 

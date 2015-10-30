@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class WeaponsIcons : MonoBehaviour
 {
 	#region Variables (public)
 
+	[SerializeField]
+	private Text pWeaponsNamesField;
 	[SerializeField]
 	private GameObject[] pWeaponsIcons;
 	
@@ -32,5 +35,10 @@ public class WeaponsIcons : MonoBehaviour
 		}
 
 		return null;
+	}
+
+	public void PrintWeaponName(string pWeaponName)
+	{
+		pWeaponsNamesField.text = pWeaponName;
 	}
 }
