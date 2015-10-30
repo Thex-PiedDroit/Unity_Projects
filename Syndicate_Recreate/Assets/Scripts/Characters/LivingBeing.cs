@@ -42,8 +42,8 @@ public class LivingBeing : MonoBehaviour
 
 	protected GameObject m_pTarget = null;
 
-	static protected int s_iLivingBeingsLayer = 1 << LayerMask.NameToLayer("LivingBeing");
-	static protected int s_iDeadsLayers = 1 << LayerMask.NameToLayer("Dead");
+	static protected int s_iLivingBeingsLayer;
+	static protected int s_iDeadsLayers;
 
 	#endregion
 
@@ -57,6 +57,9 @@ public class LivingBeing : MonoBehaviour
 
 	protected virtual void Start()
 	{
+		s_iLivingBeingsLayer = 1 << LayerMask.NameToLayer("LivingBeing");
+		s_iDeadsLayers = 1 << LayerMask.NameToLayer("Dead");
+
 		if (m_pActiveWeapon)
 		{
 			m_pActiveWeapon = Instantiate(m_pActiveWeapon, transform.position, transform.rotation) as Weapon;
@@ -119,6 +122,8 @@ public class LivingBeing : MonoBehaviour
 		if (((m_eBehaviour == Behaviour.Player && m_tNavMeshAgent.hasPath) ||
 			(m_eBehaviour == Behaviour.Player && m_pTarget != null)) == false)
 			m_pTarget = pAttacker;
+
+		CameraControl.StartShaking();
 	}
 
 	protected virtual void OnDeath()

@@ -23,14 +23,17 @@ public class Map : MonoBehaviour
 	private Transform pCiviliansContainer;
 	private Transform pBadGuysContainer;
 
-	static protected int s_iGroundLayer = 1 << LayerMask.NameToLayer("Ground");
-	static protected int s_iObstaclesLayer = 1 << LayerMask.NameToLayer("Obstacle");
+	static protected int s_iGroundLayer;
+	static protected int s_iObstaclesLayer;
 	
 	#endregion
 
 
 	void Awake()
 	{
+		s_iGroundLayer = 1 << LayerMask.NameToLayer("Ground");
+		s_iObstaclesLayer = 1 << LayerMask.NameToLayer("Obstacle");
+
 		if (m_bGenerate)
 		{
 			pCiviliansContainer = GameObject.Find("Civilians").transform;

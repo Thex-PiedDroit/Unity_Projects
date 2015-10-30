@@ -135,9 +135,12 @@ public class MissionManager : MonoBehaviour
 
 	static void EndMission(bool bSuccess)
 	{
-		s_pThis.tHUD.SetActive(false);
-		s_pThis.tMissionSucceededScreen.SetActive(bSuccess);
-		s_pThis.tMissionFailedScreen.SetActive(!bSuccess);
+		if (s_pThis.tHUD)
+		{
+			s_pThis.tHUD.SetActive(false);
+			s_pThis.tMissionSucceededScreen.SetActive(bSuccess);
+			s_pThis.tMissionFailedScreen.SetActive(!bSuccess);
+		}
 	}
 
 	void ToggleMissionSucceeded()

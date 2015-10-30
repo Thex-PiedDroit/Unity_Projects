@@ -6,21 +6,18 @@ public class Main_Title_MouseOver : MonoBehaviour
 	#region Variables (public)
 
 	[SerializeField]
+	private GameObject m_pGreyButton;
+	[SerializeField]
 	private GameObject m_pButtonMouseOverOverlay;
 	[SerializeField]
 	private GameObject m_pButtonClickedOverlay;
-	
-	#endregion
-	
-	#region Variables (private)
-	
-	
 	
 	#endregion
 
 	
 	public void MouseEnter()
 	{
+		m_pGreyButton.SetActive(false);
 		m_pButtonMouseOverOverlay.SetActive(true);
 	}
 
@@ -28,6 +25,7 @@ public class Main_Title_MouseOver : MonoBehaviour
 	{
 		m_pButtonMouseOverOverlay.SetActive(false);
 		m_pButtonClickedOverlay.SetActive(false);
+		m_pGreyButton.SetActive(true);
 	}
 
 	public void MouseDown()
