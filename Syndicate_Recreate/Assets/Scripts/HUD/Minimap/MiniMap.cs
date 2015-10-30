@@ -54,13 +54,14 @@ public class MiniMap : MonoBehaviour
 
 		GameObject[] pBuildings = GameObject.FindGameObjectsWithTag("Building");
 
+		int i = 0;
 		int iBlipsCount = 0;
 
-		foreach (GameObject tBuilding in pBuildings)
+		for (i = 0; i < pBuildings.Length; i++)
 		{
 			pBlips.Add(Instantiate<GameObject>(tBuildingBlip));
 			pBlips[iBlipsCount].name = tBuildingBlip.name;
-			pBlips[iBlipsCount].GetComponent<Blip>().Target = tBuilding.transform;
+			pBlips[iBlipsCount].GetComponent<Blip>().Target = pBuildings[i].transform;
 
 			RectTransform tBlipTransform = pBlips[iBlipsCount].GetComponent<RectTransform>();
 			tBlipTransform.sizeDelta = tBuildingsMeshSize;
@@ -73,14 +74,14 @@ public class MiniMap : MonoBehaviour
 
 		GameObject[] pWalls = GameObject.FindGameObjectsWithTag("Wall");
 
-		foreach (GameObject tWall in pWalls)
+		for (i = 0; i < pWalls.Length; i++)
 		{
 			pBlips.Add(Instantiate<GameObject>(tBuildingBlip));
 			pBlips[iBlipsCount].name = tBuildingBlip.name;
-			pBlips[iBlipsCount].GetComponent<Blip>().Target = tWall.transform;
+			pBlips[iBlipsCount].GetComponent<Blip>().Target = pWalls[i].transform;
 
 			RectTransform tBlipTransform = pBlips[iBlipsCount].GetComponent<RectTransform>();
-			tBlipTransform.sizeDelta = new Vector2(tWall.transform.localScale.x, tWall.transform.localScale.z);
+			tBlipTransform.sizeDelta = new Vector2(pWalls[i].transform.localScale.x, pWalls[i].transform.localScale.z);
 			pBlips[iBlipsCount].transform.SetParent(pBlipsParent, false);
 
 			iBlipsCount++;
@@ -93,7 +94,7 @@ public class MiniMap : MonoBehaviour
 		LivingBeing[] pLivingBeingsComponents = GameObject.FindObjectsOfType<LivingBeing>();
 		pLivingBeings = new GameObject[pLivingBeingsComponents.Length];
 
-		for (int i = 0; i < pLivingBeingsComponents.Length; i++)
+		for (i = 0; i < pLivingBeingsComponents.Length; i++)
 		{
 			pLivingBeings[i] = pLivingBeingsComponents[i].gameObject.transform.parent.gameObject;
 

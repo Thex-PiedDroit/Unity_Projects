@@ -146,7 +146,8 @@ public class MissionManager : MonoBehaviour
 	void ToggleMissionSucceeded()
 	{
 		m_bMissionSucceeded = true;
-		tEscapePointMinimapBlip.SetActive(true);
+		if (tEscapePointMinimapBlip)	// Might not be true on editor's play mode Quit();
+			tEscapePointMinimapBlip.SetActive(true);
 	}
 
 

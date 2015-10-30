@@ -108,12 +108,12 @@ public class Map : MonoBehaviour
 	{
 		LivingBeing[] pLivingBeings = GameObject.FindObjectsOfType<LivingBeing>();
 
-		foreach(LivingBeing tLivingBeing in pLivingBeings)
+		for (int i = 0; i < pLivingBeings.Length; i++)
 		{
-			if (tLivingBeing.gameObject.transform.parent.gameObject.tag != "Target" &&
-				tLivingBeing.gameObject.transform.parent.gameObject.tag != "PlayerCharacter")
+			if (pLivingBeings[i].gameObject.transform.parent.gameObject.tag != "Target" &&
+				pLivingBeings[i].gameObject.transform.parent.gameObject.tag != "PlayerCharacter")
 			{
-				Destroy(tLivingBeing.gameObject.transform.parent.gameObject);
+				Destroy(pLivingBeings[i].gameObject.transform.parent.gameObject);
 			}
 		}
 	}

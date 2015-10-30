@@ -82,7 +82,8 @@ public class AI : LivingBeing
 			case Behaviour.Defensive:
 			case Behaviour.Agressive:
 
-				SearchTarget();
+				if (!(m_eBehaviour == Behaviour.Coward && m_pTarget))
+					SearchTarget();
 				break;
 
 			case Behaviour.Ally:
@@ -171,15 +172,15 @@ public class AI : LivingBeing
 			{
 				float fNearestCharacterSqrdDist = m_fSightRange * m_fSightRange;
 
-				foreach (GameObject tCharacter in s_pPlayerCharacters)
+				for (int i = 0; i < s_pPlayerCharacters.Length; i++)
 				{
-					if (!tCharacter.GetComponentInChildren<LivingBeing>().IsDead)
+					if (!s_pPlayerCharacters[i].GetComponentInChildren<LivingBeing>().IsDead)
 					{
-						float fSqrdDist = (transform.position - tCharacter.transform.position).sqrMagnitude;
+						float fSqrdDist = (transform.position - s_pPlayerCharacters[i].transform.position).sqrMagnitude;
 
 						if (fSqrdDist < fNearestCharacterSqrdDist)
 						{
-							pTarget = tCharacter.gameObject;
+							pTarget = s_pPlayerCharacters[i].gameObject;
 							fNearestCharacterSqrdDist = fSqrdDist;
 						}
 					}
@@ -229,6 +230,7 @@ public class AI : LivingBeing
 			}
 		}
 
+		m_tNavMeshAgent.SetDestination(transform.position);
 		m_pTarget = pTarget;
 	}
 

@@ -218,7 +218,7 @@ public class LivingBeing : MonoBehaviour
 		{
 			Vector3 tFleeDestination = transform.position;
 
-			if (tag != "Target")
+			if (transform.parent.tag != "Target")
 			{
 				if (IsTargetInRange(m_fSightRange))
 				{

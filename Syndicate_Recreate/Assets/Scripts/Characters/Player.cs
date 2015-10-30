@@ -109,21 +109,4 @@ public class Player : LivingBeing
 	{
 		get { return m_pAttacker; }
 	}
-
-
-	void OnTriggerEnter(Collider tTrigger)
-	{
-		if (tTrigger.gameObject.tag == "Building")
-		{
-			tTrigger.gameObject.GetComponent<BuildingBehaviour>().ToggleFloorsAboveRenderers();
-		}
-	}
-
-	void OnTriggerExit(Collider tTrigger)
-	{
-		if (tTrigger.gameObject.tag == "Building")
-		{
-			tTrigger.gameObject.GetComponent<BuildingBehaviour>().ToggleFloorsAboveRenderers();
-		}
-	}
 }
