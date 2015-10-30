@@ -44,7 +44,7 @@ public class CharactersControl : MonoBehaviour
 	
 	void Update()
 	{
-		if (Input.GetButton("Submit"))
+		if (Input.GetButtonDown("Submit"))
 		{
 			if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
 			{

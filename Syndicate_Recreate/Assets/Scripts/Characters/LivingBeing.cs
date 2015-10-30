@@ -17,6 +17,8 @@ public class LivingBeing : MonoBehaviour
 	protected float m_fSightRange = 25.0f;
 	[SerializeField]
 	protected Weapon m_pActiveWeapon;
+	[SerializeField]
+	private ParticleSystem m_tBloodEmitter;
 	
 	#endregion
 
@@ -49,6 +51,9 @@ public class LivingBeing : MonoBehaviour
 
 	#region Variables (private)
 
+	private float m_fBloodTimeMax = 0.1f;
+	private float m_fBloodTimer = 0.0f;
+
 	private float m_fDefaultSpeed;
 	private bool m_bOpenedFire = false;
 	
@@ -69,6 +74,9 @@ public class LivingBeing : MonoBehaviour
 		m_fHealth = m_fMaxHealth;
 		m_tNavMeshAgent = GetComponentInParent<NavMeshAgent>();
 		m_fDefaultSpeed = m_tNavMeshAgent.speed;
+
+		m_tBloodEmitter.gameObject.SetActive(true);
+		m_tBloodEmitter.Stop();
 	}
 
 	protected virtual void Update()
@@ -115,6 +123,12 @@ public class LivingBeing : MonoBehaviour
 				}
 			}
 		}
+
+		if (m_fBloodTimer != 0.0f && (Time.fixedTime - m_fBloodTimer) >= m_fBloodTimeMax)
+		{
+			m_tBloodEmitter.Stop();
+			m_fBloodTimer = 0.0f;
+		}
 	}
 
 	protected virtual void OnAttacked(GameObject pAttacker)
@@ -124,6 +138,8 @@ public class LivingBeing : MonoBehaviour
 			m_pTarget = pAttacker;
 
 		CameraControl.StartShaking();
+		m_tBloodEmitter.Play();
+		m_fBloodTimer = Time.fixedTime;
 	}
 
 	protected virtual void OnDeath()
