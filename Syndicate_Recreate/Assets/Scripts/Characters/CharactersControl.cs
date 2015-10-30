@@ -30,7 +30,7 @@ public class CharactersControl : MonoBehaviour
 	#endregion
 
 
-	void Start()
+	void Awake()
 	{
 		pHUDInventory = GameObject.Find("Inventory").transform;
 
@@ -314,7 +314,7 @@ public class CharactersControl : MonoBehaviour
 	#endregion Methods
 
 
-	public static LivingBeing[] PlayerCharacters
+	public static Player[] PlayerCharacters
 	{
 		get { return s_pCharacters; }
 	}

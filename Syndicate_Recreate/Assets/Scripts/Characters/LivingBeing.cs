@@ -87,8 +87,7 @@ public class LivingBeing : MonoBehaviour
 
 		if (m_pTarget)
 		{
-			if (m_pTarget.GetComponent<LivingBeing>().IsDead ||
-				(m_eBehaviour == Behaviour.Player && m_pTarget.GetComponent<LivingBeing>().m_eBehaviour == Behaviour.Ally))
+			if (m_pTarget.GetComponent<LivingBeing>().IsDead || IsTargetFriendly())
 			{
 				m_pTarget = null;
 			}
@@ -136,7 +135,10 @@ public class LivingBeing : MonoBehaviour
 		if (((m_eBehaviour == Behaviour.Player && m_tNavMeshAgent.hasPath) ||
 			(m_eBehaviour == Behaviour.Player && m_pTarget != null)) == false)
 			m_pTarget = pAttacker;
+	}
 
+	protected virtual void OnDamageReceived()
+	{
 		CameraControl.StartShaking();
 		m_tBloodEmitter.Play();
 		m_fBloodTimer = Time.fixedTime;
@@ -257,6 +259,19 @@ public class LivingBeing : MonoBehaviour
 			OnDeath();
 
 		OnAttacked(pAttacker);
+
+		if (fDamages > 0.0f)
+			OnDamageReceived();
+	}
+
+	bool IsTargetFriendly()
+	{
+		Behaviour eTargetBehaviour = m_pTarget.GetComponent<LivingBeing>().m_eBehaviour;
+
+		bool bTargetFriendly = ((m_eBehaviour == Behaviour.Player) && (m_eBehaviour == Behaviour.Ally)) ||
+							   ((m_eBehaviour != Behaviour.Player) && (eTargetBehaviour != Behaviour.Ally) && (eTargetBehaviour != Behaviour.Player));
+
+		return bTargetFriendly;
 	}
 
 	bool IsTargetVisible()
@@ -309,6 +324,41 @@ public class LivingBeing : MonoBehaviour
 				m_pActiveWeapon.gameObject.activeSelf)
 			{
 				m_pTarget = value;
+			}
+		}
+	}
+
+	public string ActiveWeaponName
+	{
+		get
+		{
+			if (m_pActiveWeapon && m_pActiveWeapon.gameObject.activeSelf)
+				return m_pActiveWeapon.name;
+
+			return "No active weapon";
+		}
+	}
+
+	public Weapon ActiveWeapon
+	{
+		set
+		{
+			bool bEquipNewWeapon = true;
+
+			if (m_pActiveWeapon && m_pActiveWeapon.name != value.name)
+				Destroy(m_pActiveWeapon.gameObject);
+
+			else if (m_pActiveWeapon)
+			{
+				m_pActiveWeapon.gameObject.SetActive(!m_pActiveWeapon.gameObject.activeSelf);
+				bEquipNewWeapon = false;
+			}
+
+			if (bEquipNewWeapon)
+			{
+				m_pActiveWeapon = Instantiate(value, transform.position, transform.rotation) as Weapon;
+				m_pActiveWeapon.name = value.name;
+				m_pActiveWeapon.transform.parent = transform;
 			}
 		}
 	}

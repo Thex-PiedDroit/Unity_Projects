@@ -22,6 +22,8 @@ public class Player : LivingBeing
 
 	private float m_fKeepAttackerInCacheDuration = 2.0f;
 	private float m_fLastAttackedTime = 0.0f;
+
+	static private Player[] s_pCharacters;
 	
 	#endregion
 
@@ -29,6 +31,8 @@ public class Player : LivingBeing
 	protected override void Start()
 	{
 		base.Start();
+
+		s_pCharacters = CharactersControl.PlayerCharacters;
 
 		m_fDefaultHealthBarScaleY = tHealthBarGizmo.localScale.y;
 	}
@@ -54,6 +58,21 @@ public class Player : LivingBeing
 		m_pAttacker = pAttacker;
 		m_fLastAttackedTime = Time.fixedTime;
 		UpdateHealthBar();
+
+		for (int i = 0; i < s_pCharacters.Length; i++)
+		{
+			if (s_pCharacters[i] != this)
+			{
+				bool bIsPlayerInRange = (transform.position - s_pCharacters[i].transform.position).sqrMagnitude <= (m_fSightRange * m_fSightRange);
+
+				if (s_pCharacters[i].m_pTarget == null && bIsPlayerInRange &&
+					s_pCharacters[i].m_tNavMeshAgent.hasPath == false)
+				{
+					s_pCharacters[i].m_pTarget = pAttacker;
+					s_pCharacters[i].m_bPursuingTarget = true;
+				}
+			}
+		}
 	}
 
 	protected override void OnDeath()
@@ -84,41 +103,6 @@ public class Player : LivingBeing
 	public Vector3 Destination
 	{
 		set { m_tNavMeshAgent.SetDestination(value); }
-	}
-
-	public string ActiveWeaponName
-	{
-		get
-		{
-			if (m_pActiveWeapon && m_pActiveWeapon.gameObject.activeSelf)
-				return m_pActiveWeapon.name;
-
-			return "No active weapon";
-		}
-	}
-
-	public Weapon ActiveWeapon
-	{
-		set
-		{
-			bool bEquipNewWeapon = true;
-
-			if (m_pActiveWeapon && m_pActiveWeapon.name != value.name)
-				Destroy(m_pActiveWeapon.gameObject);
-
-			else if (m_pActiveWeapon)
-			{
-				m_pActiveWeapon.gameObject.SetActive(!m_pActiveWeapon.gameObject.activeSelf);
-				bEquipNewWeapon = false;
-			}
-
-			if (bEquipNewWeapon)
-			{
-				m_pActiveWeapon = Instantiate(value, transform.position, transform.rotation) as Weapon;
-				m_pActiveWeapon.name = value.name;
-				m_pActiveWeapon.transform.parent = transform;
-			}
-		}
 	}
 
 	public GameObject Attacker

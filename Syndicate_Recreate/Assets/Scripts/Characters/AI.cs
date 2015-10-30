@@ -13,6 +13,11 @@ public class AI : LivingBeing
 	private Vector2 m_tIdleTimeMinMax = new Vector2(0.0f, 4.0f);
 	[SerializeField]
 	private float m_fBodyDespawnTime = 2.0f;
+
+	[SerializeField]
+	private GameObject m_pTargetProjectorHostile;
+	[SerializeField]
+	private GameObject m_pTargetProjectorFriendly;
 	
 	#endregion
 	
@@ -53,7 +58,15 @@ public class AI : LivingBeing
 		if (s_pPlayerCharacters == null)
 		{
 			s_pPlayerCharacters = GameObject.FindGameObjectsWithTag("PlayerCharacter");
-			s_pPlayerCharactersScripts = GameObject.FindObjectsOfType<Player>();
+			s_pPlayerCharactersScripts = CharactersControl.PlayerCharacters;
+		}
+
+		if (gameObject.transform.parent.tag == "Target")
+		{
+			string pProjectorName = m_pTargetProjectorHostile.name;
+			m_pTargetProjectorHostile = Instantiate(m_pTargetProjectorHostile, transform.parent.position, m_pTargetProjectorHostile.transform.rotation) as GameObject;
+			m_pTargetProjectorHostile.name = pProjectorName;
+			m_pTargetProjectorHostile.transform.parent = transform.parent;
 		}
 
 		base.Start();
@@ -179,16 +192,17 @@ public class AI : LivingBeing
 			{
 				Collider[] pLivingBeingsInSight = Physics.OverlapSphere(transform.position, m_fSightRange, s_iLivingBeingsLayer);
 
-				if (pLivingBeingsInSight.Length <= 1)
+				if (pLivingBeingsInSight.Length <= 1)		// If nobody in sight
 					m_bPursuingTarget = false;
 
 				else
 				{
-					foreach (Collider tLivingBeingCollider in pLivingBeingsInSight)
+					for (int i = 0; i < pLivingBeingsInSight.Length; i++)
 					{
-						LivingBeing tLivingBeing = tLivingBeingCollider.gameObject.GetComponent<LivingBeing>();
+						LivingBeing tLivingBeing = pLivingBeingsInSight[i].gameObject.GetComponent<LivingBeing>();
 
-						if (tLivingBeing.Target != null)
+						if (tLivingBeing.Target != null ||
+							(tLivingBeing.IsPlayer && tLivingBeing.ActiveWeaponName != "No active weapon"))
 						{
 							if (!m_bPursuingTarget)
 							{
@@ -225,8 +239,13 @@ public class AI : LivingBeing
 
 		for (int i = 0; i < s_pPlayerCharacters.Length; i++)
 		{
-			if ((transform.position - s_pPlayerCharacters[i].transform.position).sqrMagnitude <= fNearestCharacterSqrdDist)
+			float fSqrDist = (transform.position - s_pPlayerCharacters[i].transform.position).sqrMagnitude;
+
+			if (fSqrDist <= fNearestCharacterSqrdDist)
+			{
 				iNearestPlayer = i;
+				fNearestCharacterSqrdDist = fSqrDist;
+			}
 		}
 
 		if (iNearestPlayer != -1)
@@ -247,6 +266,16 @@ public class AI : LivingBeing
 		{
 			m_eBehaviour = Behaviour.Ally;
 			m_eWanderingBehaviour = WanderType.Area;
+
+			if (transform.parent.tag == "Target")
+			{
+				Destroy(m_pTargetProjectorHostile);
+
+				string pProjectorName = m_pTargetProjectorFriendly.name;
+				m_pTargetProjectorFriendly = Instantiate(m_pTargetProjectorFriendly, transform.parent.position, m_pTargetProjectorFriendly.transform.rotation) as GameObject;
+				m_pTargetProjectorFriendly.name = pProjectorName;
+				m_pTargetProjectorFriendly.transform.parent = transform.parent;
+			}
 		}
 
 		OnAttacked(pAttacker);
@@ -260,6 +289,7 @@ public class AI : LivingBeing
 	}
 
 	#endregion Methods
+
 
 	public Vector3 WanderCenterPoint
 	{
