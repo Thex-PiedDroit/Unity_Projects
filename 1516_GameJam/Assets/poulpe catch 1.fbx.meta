@@ -1,0 +1,210 @@
+fileFormatVersion: 2
+guid: 2ee9c6fe1471fa4429ed06a54a493e41
+timeCreated: 1442578139
+licenseType: Free
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: body
+    100002: body 1
+    100004: head
+    100006: head_end
+    100008: Kraken:Group64097
+    100010: //RootNode
+    100012: ROOT
+    100014: tentacle_bot_1
+    100016: tentacle_bot_2
+    100018: tentacle_bot_3
+    100020: tentacle_bot_4
+    100022: tentacle_bot_5
+    100024: tentacle_end_1
+    100026: tentacle_end_2
+    100028: tentacle_end_3
+    100030: tentacle_end_4
+    100032: tentacle_end_5
+    100034: tentacle_mid_1
+    100036: tentacle_mid_2
+    100038: tentacle_mid_3
+    100040: tentacle_mid_4
+    100042: tentacle_mid_5
+    100044: tentacle_top_1
+    100046: tentacle_top_2
+    100048: tentacle_top_3
+    100050: tentacle_top_4
+    100052: tentacle_top_5
+    400000: body
+    400002: body 1
+    400004: head
+    400006: head_end
+    400008: Kraken:Group64097
+    400010: //RootNode
+    400012: ROOT
+    400014: tentacle_bot_1
+    400016: tentacle_bot_2
+    400018: tentacle_bot_3
+    400020: tentacle_bot_4
+    400022: tentacle_bot_5
+    400024: tentacle_end_1
+    400026: tentacle_end_2
+    400028: tentacle_end_3
+    400030: tentacle_end_4
+    400032: tentacle_end_5
+    400034: tentacle_mid_1
+    400036: tentacle_mid_2
+    400038: tentacle_mid_3
+    400040: tentacle_mid_4
+    400042: tentacle_mid_5
+    400044: tentacle_top_1
+    400046: tentacle_top_2
+    400048: tentacle_top_3
+    400050: tentacle_top_4
+    400052: tentacle_top_5
+    4300000: Kraken:Group64097
+    7400000: Catch
+    9500000: //RootNode
+    11100000: //RootNode
+    13700000: Kraken:Group64097
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 3
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Catch
+      takeName: Take 001
+      firstFrame: 1
+      lastFrame: 50
+      wrapMode: 1
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: body
+        weight: 1
+      - path: Kraken:Group64097
+        weight: 1
+      - path: ROOT
+        weight: 1
+      - path: ROOT/body 1
+        weight: 1
+      - path: ROOT/body 1/head
+        weight: 1
+      - path: ROOT/body 1/head/head_end
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_1
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_1/tentacle_mid_1
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_1/tentacle_mid_1/tentacle_bot_1
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_1/tentacle_mid_1/tentacle_bot_1/tentacle_end_1
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_2
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_2/tentacle_mid_2
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_2/tentacle_mid_2/tentacle_bot_2
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_2/tentacle_mid_2/tentacle_bot_2/tentacle_end_2
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_3
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_3/tentacle_mid_3
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_3/tentacle_mid_3/tentacle_bot_3
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_3/tentacle_mid_3/tentacle_bot_3/tentacle_end_3
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_4
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_4/tentacle_mid_4
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_4/tentacle_mid_4/tentacle_bot_4
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_4/tentacle_mid_4/tentacle_bot_4/tentacle_end_4
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_5
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_5/tentacle_mid_5
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_5/tentacle_mid_5/tentacle_bot_5
+        weight: 1
+      - path: ROOT/body 1/tentacle_top_5/tentacle_mid_5/tentacle_bot_5/tentacle_end_5
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 50
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 0
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 0
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 0
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
