@@ -1,0 +1,29 @@
+{
+	"Buildings":
+	{
+		"HOUSE":
+		{
+            "PublicName": "House",
+            "AssetsName":  "House",
+			"Health": 10
+		},
+		"WORKSHOP":
+		{
+			"PublicName": "Workshop",
+            "AssetsName":  "Workshop",
+			"Health": 10
+		},
+		"CHURCH":
+		{
+			"PublicName": "Church",
+            "AssetsName":  "Church",
+			"Health": 10
+		},
+		"BARRACKS":
+		{
+			"PublicName": "Barracks",
+            "AssetsName":  "Barracks",
+			"Health": 10
+		}
+	}
+}

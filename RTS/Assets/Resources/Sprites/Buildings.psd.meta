@@ -1,0 +1,137 @@
+fileFormatVersion: 2
+guid: 80ee9cc41dbab07419ccb1296e1e185b
+timeCreated: 1465764919
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: Church
+    21300002: Barracks
+    21300004: House
+    21300006: Workshop
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 1024
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: Church
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 14
+        width: 179
+        height: 178
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -80.5, y: 89}
+        - {x: -89.5, y: 58}
+        - {x: -89.5, y: 43}
+        - {x: -86.5, y: 15}
+        - {x: -85.5, y: 12}
+        - {x: -85.5, y: -32}
+        - {x: -82.5, y: -89}
+        - {x: 89.5, y: -89}
+        - {x: 89.5, y: 30}
+        - {x: 29.5, y: 89}
+      - - {x: -13.5, y: 87}
+        - {x: -13.5, y: 89}
+        - {x: -18.5, y: 89}
+        - {x: -16.5, y: 86}
+    - name: Barracks
+      rect:
+        serializedVersion: 2
+        x: 180
+        y: 112
+        width: 133
+        height: 80
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -21.5, y: 40}
+        - {x: -63.5, y: 14}
+        - {x: -66.5, y: -7}
+        - {x: -66.5, y: -40}
+        - {x: 66.5, y: -40}
+        - {x: 66.5, y: 15}
+        - {x: 14.5, y: 40}
+    - name: House
+      rect:
+        serializedVersion: 2
+        x: 181
+        y: 0
+        width: 111
+        height: 112
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -55.5, y: 56}
+        - {x: -55.5, y: -56}
+        - {x: 55.5, y: -56}
+        - {x: 55.5, y: 56}
+    - name: Workshop
+      rect:
+        serializedVersion: 2
+        x: 292
+        y: 0
+        width: 136
+        height: 107
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -57, y: 53.5}
+        - {x: -68, y: 25.5}
+        - {x: -68, y: -48.5}
+        - {x: -65, y: -53.5}
+        - {x: 68, y: -53.5}
+        - {x: 68, y: 42.5}
+        - {x: 58, y: 53.5}
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
