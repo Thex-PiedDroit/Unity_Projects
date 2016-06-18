@@ -14,8 +14,8 @@ public class ConstructionMenuItem : MonoBehaviour
 	#endregion
 
 #region Variables (private)
-	
-	
+
+	private BuildingData m_pAttachedBuilding = null;
 
     #endregion
 	
@@ -23,5 +23,11 @@ public class ConstructionMenuItem : MonoBehaviour
 	public void Init(BuildingData pBuilding)
 	{
 		m_pSprite.sprite = ToolKit.GetSpriteFromAtlas(pBuilding.m_pAssetsName, "Buildings");
+		m_pAttachedBuilding = pBuilding;
+	}
+
+	public void Click()
+	{
+		
 	}
 }

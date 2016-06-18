@@ -53,6 +53,14 @@ public class InputsManager : MonoBehaviour
 	
 	void Update()
 	{
+		CatchInputs();
+	}
+
+	void CatchInputs()
+	{
+		if (UIManager.Instance.MouseOverMenu)
+			return;
+
 		if (Input.GetButtonDown("Submit"))
 		{
 			StartCoroutine(DrawSquareSelection());

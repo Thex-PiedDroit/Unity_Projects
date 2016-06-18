@@ -31,7 +31,7 @@ public class ConstructionMenu : MonoBehaviour
 			return;
 		}
 
-		Instance = this;		
+		Instance = this;
 	}
 
 	void Start()

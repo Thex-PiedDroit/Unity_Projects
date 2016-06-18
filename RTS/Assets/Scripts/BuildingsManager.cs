@@ -37,9 +37,11 @@ public class BuildingsManager : MonoBehaviour
 		}
 
 		Instance = this;
+
+		Initialize();
 	}
 	
-	void Start()
+	void Initialize()
 	{
 		Building[] pBuildings = Resources.LoadAll<Building>("Buildings");
 		m_pBuildingsPrefabs = new List<GameObject>(pBuildings.Length);
