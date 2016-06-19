@@ -28,6 +28,6 @@ public class ConstructionMenuItem : MonoBehaviour
 
 	public void Click()
 	{
-		
+		StartCoroutine(BuildingsManager.Instance.ShowBuildingShade(m_pAttachedBuilding.m_eBuildingType));
 	}
 }

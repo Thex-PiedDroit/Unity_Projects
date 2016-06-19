@@ -21,13 +21,15 @@ public abstract class EntityData
 	public float m_fHealth;
 
 	public EntityData()
+		: this(EEntityType.NONE, "Undefined", "Undefined", 0.0f)
 	{
-		m_eType = EEntityType.NONE;
+		
+	}
 
-		m_pPublicName = "Undefined";
-		m_pAssetsName = "Undefined";
+	public EntityData(EEntityType eType)
+		: this(eType, "Undefined", "Undefined", 0.0f)
+	{
 
-		m_fHealth = 0.0f;
 	}
 
 	public EntityData(EEntityType eType, string pPublicName, string pAssetsName, float fHealth)

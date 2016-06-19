@@ -16,13 +16,23 @@ public class BuildingsManager : MonoBehaviour
 	{
 		get { return m_pBuildingsData; }
 	}
+
+	public bool DraggingBuildingShade
+	{
+		get { return m_bDraggingBuildingShade; }
+	}
 	
 	#endregion
 	
 #region Variables (private)
 
-	private List<GameObject> m_pBuildingsPrefabs = null;
+	private List<Building> m_pBuildingsPrefabs = null;
+	private List<BuildingShade> m_pBuildingShadesPrefabs = null;
 	private Dictionary<EBuildingType, BuildingData> m_pBuildingsData = null;
+
+	private BuildingShade m_pCurrentBuildingShade = null;
+	private bool m_bDraggingBuildingShade = false;
+	private bool m_bDraggingCancelled = false;
 	
 	#endregion
 	
@@ -44,11 +54,14 @@ public class BuildingsManager : MonoBehaviour
 	void Initialize()
 	{
 		Building[] pBuildings = Resources.LoadAll<Building>("Buildings");
-		m_pBuildingsPrefabs = new List<GameObject>(pBuildings.Length);
-		for (int i = 0; i < m_pBuildingsPrefabs.Count; i++)
+		m_pBuildingsPrefabs = new List<Building>(pBuildings.Length);
+		BuildingShade[] pBuildingShades = Resources.LoadAll<BuildingShade>("Buildings/ConstructionShades");
+		m_pBuildingShadesPrefabs = new List<BuildingShade>(pBuildings.Length);
+		for (int i = 0; i < pBuildings.Length; i++)
 		{
-			m_pBuildingsPrefabs.Add(pBuildings[i].gameObject);
-		}
+			m_pBuildingsPrefabs.Add(pBuildings[i]);
+			m_pBuildingShadesPrefabs.Add(pBuildingShades[i]);
+		}		
 
 		m_pBuildingsData = new Dictionary<EBuildingType, BuildingData>(m_pBuildingsPrefabs.Count);
 
@@ -58,7 +71,7 @@ public class BuildingsManager : MonoBehaviour
 		{
 			BuildingData pData = new BuildingData();
 
-			EBuildingType eType = ToolKit.ToEnum<EBuildingType>(tJSONData.list[0].keys[i], EBuildingType.NONE);
+			pData.m_eBuildingType = ToolKit.ToEnum<EBuildingType>(tJSONData.list[0].keys[i], EBuildingType.NONE);
 
 			for (int j = 0; j < tJSONData.list[0].list[i].keys.Count; j++)
 			{
@@ -70,7 +83,90 @@ public class BuildingsManager : MonoBehaviour
 				}
 			}
 
-			m_pBuildingsData.Add(eType, pData);
+			m_pBuildingsData.Add(pData.m_eBuildingType, pData);
 		}
+	}
+
+	void Update()
+	{
+		if (m_bDraggingBuildingShade && Input.GetButtonDown("Move"))
+		{
+			DestroyCurrentShade();
+
+			StopAllCoroutines();
+			m_bDraggingCancelled = true;
+		}
+
+		if (m_bDraggingCancelled && Input.GetButtonUp("Move"))
+		{
+			m_bDraggingBuildingShade = false;
+			m_bDraggingCancelled = false;
+		}
+	}
+
+
+	void DestroyCurrentShade()
+	{
+		Destroy(m_pCurrentBuildingShade.gameObject);
+		m_pCurrentBuildingShade = null;
+	}
+
+	public IEnumerator ShowBuildingShade(EBuildingType eBuildingType)
+	{
+		m_bDraggingBuildingShade = true;
+
+		for (int i = 0; i < m_pBuildingShadesPrefabs.Count; i++)
+		{
+			if (m_pBuildingShadesPrefabs[i].m_eType == eBuildingType)
+			{
+				m_pCurrentBuildingShade = Instantiate<BuildingShade>(m_pBuildingShadesPrefabs[i]);
+				m_pCurrentBuildingShade.transform.SetParent(transform, false);
+				break;
+			}
+		}
+
+		if (m_pCurrentBuildingShade == null)
+		{
+			Debug.LogError("BuildingShade not found: " + eBuildingType);
+			yield break;
+		}
+
+		RaycastHit tHit;
+
+		do
+		{
+			if (m_pCurrentBuildingShade == null)
+				yield break;
+
+			Ray tRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+			if (Physics.Raycast(tRay, out tHit, 100.0f, LayersManager.Instance.GetLayer("Ground"), QueryTriggerInteraction.Ignore))
+			{
+				m_pCurrentBuildingShade.gameObject.SetActive(true);
+				m_pCurrentBuildingShade.transform.position = tHit.point;
+			}
+			else
+			{
+				m_pCurrentBuildingShade.gameObject.SetActive(false);
+			}
+
+			yield return false;
+		} while (!Input.GetButtonDown("Submit") || !m_pCurrentBuildingShade.CanBePlaced);
+
+
+		DestroyCurrentShade();
+
+		for (int i = 0; i < m_pBuildingsPrefabs.Count; i++)
+		{
+			if (m_pBuildingsPrefabs[i].m_eBuildingType == eBuildingType)
+			{
+				Building pNewBuilding = Instantiate<Building>(m_pBuildingsPrefabs[i]);
+				pNewBuilding.transform.SetParent(transform, false);
+				pNewBuilding.transform.position = tHit.point;
+				break;
+			}
+		}
+
+		m_bDraggingBuildingShade = false;
 	}
 }

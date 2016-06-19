@@ -22,9 +22,6 @@ public class InputsManager : MonoBehaviour
 	private List<SelectableEntity> m_pAllSelectables = null;
 	private List<SelectableEntity> m_pCurrentSelection = null;
 
-	private int m_iSetLayer = 0;
-
-
 	private Vector3 m_tSelectionTopLeftScreen = Vector3.zero;
 	private Vector3 m_tSelectionBottomRightScreen = Vector3.zero;
 	bool m_bShouldDrawSelection = false;
@@ -48,7 +45,6 @@ public class InputsManager : MonoBehaviour
 			m_pAllSelectables.Add(tEntity);
 
 		m_pCurrentSelection = new List<SelectableEntity>();
-		m_iSetLayer = LayerMask.GetMask("Set");
 	}
 	
 	void Update()
@@ -58,7 +54,7 @@ public class InputsManager : MonoBehaviour
 
 	void CatchInputs()
 	{
-		if (UIManager.Instance.MouseOverMenu)
+		if (UIManager.Instance.MouseOverMenu || BuildingsManager.Instance.DraggingBuildingShade)
 			return;
 
 		if (Input.GetButtonDown("Submit"))
@@ -171,6 +167,6 @@ public class InputsManager : MonoBehaviour
 		Vector3 tViewPortPos = Camera.main.ScreenToViewportPoint(tScreenPos);
 		Ray tRay = Camera.main.ViewportPointToRay(tViewPortPos);
 
-		return Physics.Raycast(tRay, out tHit, 100.0f, m_iSetLayer, QueryTriggerInteraction.Ignore);
+		return Physics.Raycast(tRay, out tHit, 100.0f, LayersManager.Instance.GetLayer("Ground"), QueryTriggerInteraction.Ignore);
 	}
 }

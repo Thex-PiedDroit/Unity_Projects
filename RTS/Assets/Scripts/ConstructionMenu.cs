@@ -58,7 +58,7 @@ public class ConstructionMenu : MonoBehaviour
 
 		foreach(KeyValuePair<EBuildingType, BuildingData> pData in pAllBuildings)
 		{
-			if (iInitializedItems >= m_pItems.Count - 1)
+			if (iInitializedItems >= m_pItems.Count)
 			{
 				GameObject pNew = GameObject.Instantiate(m_pItems[0].gameObject);
 				pNew.transform.SetParent(transform, false);

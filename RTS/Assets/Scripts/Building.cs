@@ -5,16 +5,18 @@ using System.Collections;
 
 public class BuildingData : EntityData
 {
+	public EBuildingType m_eBuildingType;
+
 	public BuildingData()
-		: base()
+		: base(EEntityType.BUILDING)
 	{
-		
+		m_eBuildingType = EBuildingType.NONE;
 	}
 
-	public BuildingData(string pPublicName, string pAssetsName, float fHealth)
+	public BuildingData(EBuildingType eBuildingType, string pPublicName, string pAssetsName, float fHealth)
 		: base(EEntityType.BUILDING, pPublicName, pAssetsName, fHealth)
 	{
-
+		m_eBuildingType = eBuildingType;
 	}
 }
 
@@ -46,7 +48,7 @@ public class Building : MonoBehaviour
 
 	public void Init(BuildingData pData)
 	{
-		
+		m_eBuildingType = pData.m_eBuildingType;
 	}
 	
 	void Update()
