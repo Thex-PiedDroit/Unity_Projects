@@ -24,6 +24,7 @@ public enum EBuildingType
 	WORKSHOP,
 	CHURCH,
 	BARRACKS,
+	BANK,
 	NONE,
 }
 
