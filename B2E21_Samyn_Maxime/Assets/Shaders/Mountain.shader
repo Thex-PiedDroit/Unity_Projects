@@ -223,7 +223,6 @@
 				// Helpers
 				half currentSlope = N.y;
 				half currentAltitude = wPos.y;
-				float rockFactor = 1;
 
 
 				/*		CLOUDS		*/
@@ -243,7 +242,6 @@
 				half dirtFactor = dirtAltitude * dirtSlope;
 				baseColor = lerp(baseColor, dirtTex, dirtFactor);
 				MGC = lerp(MGC, dirtMGC, dirtFactor);
-				rockFactor = lerp(rockFactor, 0, dirtFactor);
 
 				// Grass
 				half grassAltitude = saturate(_GrassAltitudeMax - currentAltitude);
@@ -256,7 +254,6 @@
 				half3 grassColor = (((grassTex + grassYellow) * 0.5) * grassAltitude);
 				baseColor = lerp(baseColor, grassColor, grassFactor);
 				MGC = lerp(MGC, grassMGC, grassFactor);
-				rockFactor = lerp(rockFactor, 0, grassFactor);
 
 				// Snow
 				half snowAltitude = saturate(currentAltitude - _SnowAltitudeMin);
@@ -264,7 +261,6 @@
 				half snowFactor = snowAltitude * snowSlope;
 				baseColor = lerp(baseColor, snowTex, snowFactor);
 				MGC = lerp(MGC, snowMGC, snowFactor);
-				rockFactor = lerp(rockFactor, 0, snowFactor);
 
 
 				half gloss = MGC.g;
